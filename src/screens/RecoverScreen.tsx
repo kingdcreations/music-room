@@ -1,39 +1,36 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useContext, useState } from 'react';
 import { FirebaseContext } from '../providers/FirebaseContext';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { RootStackScreenProps } from '../types';
+import { Button, FormControl, Input, ScrollView, useToast } from 'native-base';
+import Card from '../components/Card';
 
 export default function Recover({
   navigation
 }: RootStackScreenProps<'Recover'>) {
 
   const [mail, setMail] = useState("")
-  const [error, setError] = useState("");
 
+  const toast = useToast();
   const firebase = useContext(FirebaseContext)
 
   const recover = () => {
     firebase?.auth && sendPasswordResetEmail(firebase.auth, mail)
-      .then(() => setError(""))
-      .catch(e => setError(e.code))
+      .catch(e => toast.show({ description: e.code }))
   }
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        onChangeText={setMail}
-        value={mail}
-        placeholder="Mail"
-      />
-      <TouchableOpacity onPress={recover}>
-        <Text>Recover</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text>Cancel</Text>
-      </TouchableOpacity>
-      <Text>{error}</Text>
-    </View>
+    <ScrollView contentContainerStyle={styles.container} m={5}>
+      <Card>
+        <FormControl isRequired>
+          <FormControl.Label>Email address</FormControl.Label>
+          <Input onChangeText={setMail} value={mail} placeholder="Email address" />
+        </FormControl>
+        <Button onPress={recover}>Recover</Button>
+        <Button colorScheme='gray' onPress={() => navigation.goBack()}>Cancel</Button>
+      </Card>
+    </ScrollView>
   );
 }
 

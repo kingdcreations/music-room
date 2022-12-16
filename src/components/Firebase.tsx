@@ -5,6 +5,7 @@ import {
     FIREBASE_API_KEY,
     FIREBASE_AUTH_DOMAIN,
     FIREBASE_PROJECT_ID,
+    FIREBASE_MESSAGING_SENDER_ID,
     FIREBASE_APP_ID
 } from "@env"
 
@@ -14,10 +15,11 @@ export default class Firebase {
 
     constructor() {
         const config = {
+            appId: FIREBASE_APP_ID,
             apiKey: FIREBASE_API_KEY,
-            authDomain: FIREBASE_AUTH_DOMAIN,
             projectId: FIREBASE_PROJECT_ID,
-            appId: FIREBASE_APP_ID
+            authDomain: FIREBASE_AUTH_DOMAIN,
+            messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
         }
         const app = initializeApp(config);
 

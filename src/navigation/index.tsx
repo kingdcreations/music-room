@@ -24,11 +24,11 @@ export default function Navigation() {
     return (
         <NavigationContainer>
             {user ?
-                <Stack.Navigator>
+                <Stack.Navigator screenOptions={{ animation: 'slide_from_right' }}>
                     <Stack.Screen name="Home" component={HomeScreen} />
                 </Stack.Navigator>
                 :
-                <Stack.Navigator>
+                <Stack.Navigator screenOptions={{ animation: 'slide_from_right' }}>
                     <Stack.Screen name="Login" component={LoginScreen} />
                     <Stack.Screen name="Signin" component={SigninScreen} />
                     <Stack.Screen name="Recover" component={RecoverScreen} />

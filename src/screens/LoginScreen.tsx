@@ -1,8 +1,14 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { useContext, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { useContext, useEffect, useState } from 'react';
 import { RootStackScreenProps } from '../types';
 import { FirebaseContext } from '../providers/FirebaseContext';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithCredential, signInWithEmailAndPassword } from "firebase/auth";
+import * as Google from 'expo-auth-session/providers/google';
+import { Input, Button, FormControl, Text, Divider, Icon, ScrollView } from 'native-base';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useToast } from 'native-base';
+import { FIREBASE_CLIENT_ID } from '@env';
+import Card from '../components/Card';
 
 export default function LoginScreen({
   navigation
@@ -10,43 +16,57 @@ export default function LoginScreen({
 
   const [mail, setMail] = useState("")
   const [pass, setPass] = useState("")
-  const [error, setError] = useState("");
 
+  const toast = useToast();
   const firebase = useContext(FirebaseContext)
+
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    clientId: FIREBASE_CLIENT_ID,
+  });
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const credential = GoogleAuthProvider.credential(response.params.id_token);
+      firebase?.auth && signInWithCredential(firebase.auth, credential);
+    }
+  }, [response]);
 
   const login = () => {
     firebase?.auth && signInWithEmailAndPassword(firebase.auth, mail, pass)
-      .catch(e => setError(e.code))
+      .catch(e => toast.show({ description: e.code }))
   };
 
   const signin = () => navigation.navigate('Signin')
-
   const recover = () => navigation.navigate('Recover')
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        onChangeText={setMail}
-        value={mail}
-        placeholder="Mail"
-      />
-      <TextInput
-        onChangeText={setPass}
-        value={pass}
-        placeholder="Password"
-        secureTextEntry
-      />
-      <TouchableOpacity onPress={login}>
-        <Text>Login</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={signin}>
-        <Text>Sign in</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={recover}>
-        <Text>Recover password</Text>
-      </TouchableOpacity>
-      <Text>{error}</Text>
-    </View>
+    <ScrollView contentContainerStyle={styles.container} m={5}>
+      <Card>
+        <FormControl isRequired>
+          <FormControl.Label>Email address</FormControl.Label>
+          <Input onChangeText={setMail} value={mail} placeholder="Email address" />
+
+          <FormControl.Label>Password</FormControl.Label>
+          <Input onChangeText={setPass} value={pass} type="password" placeholder="Password" />
+        </FormControl>
+        <Button onPress={login}>Login</Button>
+
+        <Divider />
+
+        <Button
+          variant="outline"
+          onPress={() => promptAsync()}
+          leftIcon={<Icon as={Ionicons} name="logo-google" size="sm" />}>
+          Sign in with Google
+        </Button>
+        <Button variant="link" onPress={recover}>Forgotten password</Button>
+      </Card>
+
+      <Card>
+        <Text >No account yet?</Text>
+        <Button onPress={signin}>Sign in</Button>
+      </Card>
+    </ScrollView>
   );
 }
 

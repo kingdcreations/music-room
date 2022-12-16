@@ -11,7 +11,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Text>You are logged!</Text>
+      <Text>You are logged as {firebase?.auth.currentUser?.displayName}!</Text>
 
       <TouchableOpacity onPress={logout}>
         <Text>Log out</Text>

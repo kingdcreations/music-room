@@ -1,8 +1,10 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useContext, useState } from 'react';
 import { FirebaseContext } from '../providers/FirebaseContext';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { RootStackScreenProps } from '../types';
+import { Button, FormControl, Input, ScrollView, useToast } from 'native-base';
+import Card from '../components/Card';
 
 export default function SigninScreen({
   navigation
@@ -10,36 +12,29 @@ export default function SigninScreen({
 
   const [mail, setMail] = useState("")
   const [pass, setPass] = useState("")
-  const [error, setError] = useState("");
 
+  const toast = useToast();
   const firebase = useContext(FirebaseContext)
 
   const signin = () => {
     firebase?.auth && createUserWithEmailAndPassword(firebase.auth, mail, pass)
-      .catch(e => setError(e.code))
+    .catch(e => toast.show({ description: e.code }))
   }
 
   return (
-    <View style={styles.container}>
-      <TextInput
-        onChangeText={setMail}
-        value={mail}
-        placeholder="Mail"
-      />
-      <TextInput
-        onChangeText={setPass}
-        value={pass}
-        placeholder="Password"
-        secureTextEntry
-      />
-      <TouchableOpacity onPress={signin}>
-        <Text>Sign in</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text>Cancel</Text>
-      </TouchableOpacity>
-      <Text>{error}</Text>
-    </View>
+    <ScrollView contentContainerStyle={styles.container} m={5}>
+      <Card>
+        <FormControl isRequired>
+          <FormControl.Label>Email address</FormControl.Label>
+          <Input onChangeText={setMail} value={mail} placeholder="Email address" />
+
+          <FormControl.Label>Password</FormControl.Label>
+          <Input onChangeText={setPass} value={pass} type="password" placeholder="Password" />
+        </FormControl>
+        <Button onPress={signin}>Sign in</Button>
+        <Button colorScheme='gray' onPress={() => navigation.goBack()}>Cancel</Button>
+      </Card>
+    </ScrollView>
   );
 }
 
