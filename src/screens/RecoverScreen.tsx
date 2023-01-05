@@ -16,19 +16,19 @@ export default function Recover({
   const firebase = useContext(FirebaseContext)
 
   const recover = () => {
-    firebase?.auth && sendPasswordResetEmail(firebase.auth, mail)
+    sendPasswordResetEmail(firebase.auth, mail)
       .catch(e => toast.show({ description: e.code }))
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container} m={5}>
+    <ScrollView contentContainerStyle={styles.container} mx={5}>
       <Card>
         <FormControl isRequired>
           <FormControl.Label>Email address</FormControl.Label>
           <Input onChangeText={setMail} value={mail} placeholder="Email address" />
         </FormControl>
-        <Button onPress={recover}>Recover</Button>
-        <Button colorScheme='gray' onPress={() => navigation.goBack()}>Cancel</Button>
+        <Button w="100%" onPress={recover}>Recover</Button>
+        <Button w="100%" colorScheme='gray' onPress={() => navigation.goBack()}>Cancel</Button>
       </Card>
     </ScrollView>
   );

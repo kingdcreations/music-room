@@ -27,12 +27,12 @@ export default function LoginScreen({
   useEffect(() => {
     if (response?.type === 'success') {
       const credential = GoogleAuthProvider.credential(response.params.id_token);
-      firebase?.auth && signInWithCredential(firebase.auth, credential);
+      signInWithCredential(firebase.auth, credential);
     }
   }, [response]);
 
   const login = () => {
-    firebase?.auth && signInWithEmailAndPassword(firebase.auth, mail, pass)
+    signInWithEmailAndPassword(firebase.auth, mail, pass)
       .catch(e => toast.show({ description: e.code }))
   };
 
@@ -40,7 +40,7 @@ export default function LoginScreen({
   const recover = () => navigation.navigate('Recover')
 
   return (
-    <ScrollView contentContainerStyle={styles.container} m={5}>
+    <ScrollView contentContainerStyle={styles.container} mx={5}>
       <Card>
         <FormControl isRequired>
           <FormControl.Label>Email address</FormControl.Label>
@@ -49,11 +49,12 @@ export default function LoginScreen({
           <FormControl.Label>Password</FormControl.Label>
           <Input onChangeText={setPass} value={pass} type="password" placeholder="Password" />
         </FormControl>
-        <Button onPress={login}>Login</Button>
+        <Button w="100%" onPress={login}>Login</Button>
 
         <Divider />
 
         <Button
+          w="100%"
           variant="outline"
           onPress={() => promptAsync()}
           leftIcon={<Icon as={Ionicons} name="logo-google" size="sm" />}>
@@ -64,7 +65,7 @@ export default function LoginScreen({
 
       <Card>
         <Text >No account yet?</Text>
-        <Button onPress={signin}>Sign in</Button>
+        <Button w="100%" onPress={signin}>Sign in</Button>
       </Card>
     </ScrollView>
   );
