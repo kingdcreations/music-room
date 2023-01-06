@@ -1,47 +1,56 @@
 import { StyleSheet, Text } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { FirebaseContext } from '../providers/FirebaseContext';
-import { Button, ScrollView, View } from 'native-base';
+import { Button, Flex, ScrollView, Stack, View } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
-import { onValue, ref } from 'firebase/database';
+import { equalTo, onValue, orderByChild, query, ref } from 'firebase/database';
 import { Room } from '../types/database';
+import PlaylistButton from '../components/PlaylistButton';
 
 export default function HomeScreen({
   navigation
 }: HomeStackScreenProps<'Home'>) {
   const firebase = useContext(FirebaseContext)
+  const uid = firebase.auth.currentUser?.uid
+
   const [rooms, setRooms] = useState<Room[]>([])
+  const [joinedRooms, setJoinedRooms] = useState<Room[]>([])
 
   useEffect(() => {
-    return onValue(ref(firebase.database, 'rooms'), (snapshot) => {
+    if (!uid) return
+
+    const q = query(ref(firebase.database, 'rooms'), orderByChild('owner'), equalTo(uid))
+    return onValue(q, (snapshot) => {
       const data = snapshot.val();
 
       setRooms([])
       if (snapshot.exists()) {
-        Object.values(data).map((room) => {
-          setRooms((rooms) => [...rooms, room as Room]);
-        });
+        Object.values(data).map((room) => setRooms((rooms) => {
+          const newRoom = room as Room;
+          newRoom.id = Object.keys(data)[0]
+          return [...rooms, newRoom]
+        }));
       }
     });
   }, [])
 
   return (
     <View style={styles.container}>
-      <ScrollView w='100%' p={5}>
-        <Card>
-          <Text>Create your own room</Text>
-          <Button w="100%" colorScheme='emerald' onPress={() => navigation.navigate('NewRoom')}>Add songs</Button>
-        </Card>
-
+      <ScrollView w='100%' p={5} contentContainerStyle={styles.scrollContainer}>
         <Card>
           <Text>My rooms</Text>
-          <>{rooms.map((room, i) => <Button key={i} w="100%">{room.name}</Button>)}</>
+          <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
+            {rooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
+          </Stack>
+          <Button w="100%" colorScheme='emerald' onPress={() => navigation.navigate('NewRoom')}>New room</Button>
         </Card>
 
         <Card>
           <Text>Joined rooms</Text>
-          <>{rooms.map((room, i) => <Button key={i} w="100%">{room.name}</Button>)}</>
+          <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
+            {joinedRooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
+          </Stack>
         </Card>
       </ScrollView>
     </View>
@@ -52,6 +61,10 @@ export default function HomeScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scrollContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },

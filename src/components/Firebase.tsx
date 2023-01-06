@@ -1,7 +1,8 @@
 import { initializeApp } from "firebase/app";
-import { Auth, getAuth, signInWithEmailAndPassword, updatePassword } from "firebase/auth";
+import { Auth, getAuth, initializeAuth, signInWithEmailAndPassword, updatePassword } from "firebase/auth";
 import { Firestore, getFirestore } from "firebase/firestore";
 import { Database, getDatabase } from "firebase/database";
+import { getReactNativePersistence } from 'firebase/auth/react-native';
 
 import {
     FIREBASE_API_KEY,
@@ -10,6 +11,7 @@ import {
     FIREBASE_MESSAGING_SENDER_ID,
     FIREBASE_APP_ID
 } from "@env"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default class Firebase {
     auth: Auth
@@ -27,7 +29,9 @@ export default class Firebase {
         }
         const app = initializeApp(config);
 
-        this.auth = getAuth(app);
+        this.auth = initializeAuth(app, {
+            persistence: getReactNativePersistence(AsyncStorage),
+        });
         this.firestore = getFirestore(app);
         this.database = getDatabase(app);
     }

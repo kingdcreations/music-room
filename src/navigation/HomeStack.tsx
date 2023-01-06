@@ -3,6 +3,8 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import NewRoomScreen from '../screens/NewRoomScreen';
 import { HomeStackParamList } from '../types';
+import RoomScreen from '../screens/RoomScreen';
+import AddSongScreen from '../screens/AddSongScreen';
 
 export default function HomeStack() {
   const HomeStack = createNativeStackNavigator<HomeStackParamList>();
@@ -16,9 +18,16 @@ export default function HomeStack() {
       <HomeStack.Screen
         name="Home"
         component={HomeScreen}
-        options={{
-          title: 'Home',
-        }}
+      />
+      <HomeStack.Screen
+        name="Room"
+        component={RoomScreen}
+        options={({ route }) => ({ title: route.params.room.name })}
+      />
+      <HomeStack.Screen
+        name="AddSong"
+        component={AddSongScreen}
+        options={({ route }) => ({ title: route.params.room.name })}
       />
       <HomeStack.Screen
         name="NewRoom"

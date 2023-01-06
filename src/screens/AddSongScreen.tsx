@@ -1,32 +1,17 @@
 import { StyleSheet } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
-import { Icon, Input, ScrollView, Stack, Text } from 'native-base';
+import { Button, Icon, Input, ScrollView, Stack, Text } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FirebaseContext } from '../providers/FirebaseContext';
 import Card from '../components/Card';
-import { equalTo, onValue, orderByChild, query, ref } from 'firebase/database';
 import { Room } from '../types/database';
 import PlaylistButton from '../components/PlaylistButton';
 
-export default function SearchScreen() {
+export default function AddSongScreen() {
   const [search, setSearch] = useState("")
 
   const firebase = useContext(FirebaseContext)
   const [rooms, setRooms] = useState<Room[]>([])
-
-  useEffect(() => {
-    const q = query(ref(firebase.database, 'rooms'), orderByChild('private'), equalTo(false));
-    return onValue(q, (snapshot) => {
-      const data = snapshot.val();
-
-      setRooms([])
-      if (snapshot.exists()) {
-        Object.values(data).map((room) => {
-          setRooms((rooms) => [...rooms, room as Room]);
-        });
-      }
-    });
-  }, [])
 
   return (
     <ScrollView contentContainerStyle={styles.container} m={5}>
@@ -37,8 +22,7 @@ export default function SearchScreen() {
           InputLeftElement={
             <Icon as={<Ionicons name="search" />} size={5} ml="2" color="muted.400" />
           }
-          placeholder="Looking for a particular room ?" />
-        <Text>Public rooms</Text>
+          placeholder="What are we listening to ?" />
         <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
           {rooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
         </Stack>

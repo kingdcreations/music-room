@@ -10,7 +10,9 @@ export default function Card({ children }: { children: JSX.Element | JSX.Element
             w='100%'
             mb={5}
             p={5}
+            justifyContent='center'
             alignItems='center'
+            maxWidth='750px'
         />
     )
 }
