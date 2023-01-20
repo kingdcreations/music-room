@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { Auth, getAuth, initializeAuth, signInWithEmailAndPassword, updatePassword } from "firebase/auth";
+import { Auth, initializeAuth, signInWithEmailAndPassword, updatePassword } from "firebase/auth";
 import { Firestore, getFirestore } from "firebase/firestore";
 import { Database, getDatabase } from "firebase/database";
 import { getReactNativePersistence } from 'firebase/auth/react-native';

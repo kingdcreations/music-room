@@ -26,9 +26,9 @@ export default function HomeScreen({
 
       setRooms([])
       if (snapshot.exists()) {
-        Object.values(data).map((room) => setRooms((rooms) => {
+        Object.values(data).map((room, i) => setRooms((rooms) => {
           const newRoom = room as Room;
-          newRoom.id = Object.keys(data)[0]
+          newRoom.id = Object.keys(data)[i]
           return [...rooms, newRoom]
         }));
       }

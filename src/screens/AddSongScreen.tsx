@@ -1,44 +1,51 @@
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import { AspectRatio, Button, Flex, HStack, Icon, Image, Input, ScrollView, Stack, Text, View, VStack } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FirebaseContext } from '../providers/FirebaseContext';
-import SpotifyWebApi from "spotify-web-api-node";
+import { FIREBASE_API_KEY } from '@env';
+import { Track } from '../types/database';
+import { HomeStackScreenProps } from '../types';
+import { update, ref, push, set } from 'firebase/database';
 
-export default function AddSongScreen() {
+
+export default function AddSongScreen({
+  route, navigation
+}: HomeStackScreenProps<'AddSong'>) {
   const [search, setSearch] = useState("")
   const [tracks, setTracks] = useState([])
 
   const firebase = useContext(FirebaseContext)
+  // const 
 
-  var client_id = 'fed4ddbb4f654f368d9661a7384a656a';
-  var client_secret = '4a1b01a42deb48838639fed497f898a8';
-
-  var spotifyApi = new SpotifyWebApi();
-
-  fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    body: 'grant_type=client_credentials&client_id=' + client_id + '&client_secret=' + client_secret,
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-  })
-    .then(r => r.json())
-    .then(r => {
-      spotifyApi.setAccessToken(r.access_token);
-    })
+  const addToPlaylist = (track: any) => {
+    var newtrack:Track = {
+      id: track.id.videoId,
+      title: track.snippet.title,
+      author: track.snippet.channelTitle,
+      thumbnailUrl: track.snippet.thumbnails.default.url,
+    }
+    var updates:{[id:string] : Track} = {};
+    updates['rooms/' + route.params.room.id + '/playlist'] = newtrack;
+    const playlistRef = ref(firebase.database, 'rooms/' + route.params.room.id + '/playlist');
+    console.log(route.params.room);
+    const newSongRef = push(playlistRef);
+    set(newSongRef, track);
+    // push(ref(firebase.database + ), updates)
+  }
 
   const searchTracks = () => {
-    spotifyApi.searchTracks('track:' + search, { limit: 10 }).then(
-      function (data) {
-        console.log(data.body.tracks.items[0].id);
-        
-        setTracks(data.body.tracks.items)
-      },
-      function (err) {
-        console.error(err);
-      }
-    );
+
+    fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&type=video&q='
+    + encodeURIComponent(search) + '&key=' + FIREBASE_API_KEY)
+    .then(response => response.json())
+    .then((data) => {
+      setTracks(data.items)
+    })
+    .catch(error => {
+      console.log(error);
+    })
+
   }
 
   return (
@@ -47,25 +54,25 @@ export default function AddSongScreen() {
         py={3}
         value={search}
         onChangeText={setSearch}
-        onEndEditing={searchTracks}
+        
         InputLeftElement={
           <Icon as={<Ionicons name="search" />} size={5} ml="3" color="muted.400" />
         }
         placeholder="What are we listening to ?" />
-
+      <Button onPress={searchTracks}>Search</Button>
       <ScrollView w="100%">
         <VStack w="100%" alignItems='center' p={4} space='4'>
-          {tracks.map((track, i) => (
-            <TouchableOpacity key={i} onPress={() => addToPlaylist()}>
+          {tracks.map((track: any, i) => (
+          <TouchableOpacity key={i} onPress={() => addToPlaylist(track)}>
               <HStack w="100%" space="4" alignItems='center'>
                 <Image
                   size='sm'
                   source={{
-                    uri: track.album.images[0].url
+                    uri: track.snippet.thumbnails.default.url
                   }} alt="Alternate Text" />
                 <VStack flexGrow={1} flexShrink={1}>
-                  <Text bold isTruncated>{track.name}</Text>
-                  <Text isTruncated>{track.artists.map((artist) => artist.name).join(', ')}</Text>
+                  <Text bold isTruncated>{track.snippet.title}</Text>
+                  <Text isTruncated>{track.snippet.channelTitle}</Text>
                 </VStack>
                 <Icon as={<Ionicons name="add-circle-outline" />} size={5} ml="3" color="dark.400" />
               </HStack>

@@ -22,6 +22,7 @@ export default function LoginScreen({
 
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     clientId: FIREBASE_CLIENT_ID,
+    // iosClientId: FIREBASE_CLIENT_ID
   });
 
   useEffect(() => {

@@ -17,7 +17,8 @@ export default function NewRoomScreen({
     set(push(ref(firebase.database, 'rooms')), {
       name: roomName,
       private: privateRoom,
-      owner: firebase.auth.currentUser?.uid
+      owner: firebase.auth.currentUser?.uid,
+      playlist: []
     })
     navigation.goBack()
   }

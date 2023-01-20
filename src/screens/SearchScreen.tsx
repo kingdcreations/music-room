@@ -21,9 +21,11 @@ export default function SearchScreen() {
 
       setRooms([])
       if (snapshot.exists()) {
-        Object.values(data).map((room) => {
-          setRooms((rooms) => [...rooms, room as Room]);
-        });
+        Object.values(data).map((room, i) => setRooms((rooms) => {
+          const newRoom = room as Room;
+          newRoom.id = Object.keys(data)[i]
+          return ([...rooms, room as Room])
+        }));
       }
     });
   }, [])

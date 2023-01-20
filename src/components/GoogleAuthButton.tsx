@@ -6,13 +6,14 @@ import { Button, Icon } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FIREBASE_CLIENT_ID } from '@env';
 
+
 export default function GoogleAuthButton() {
     const firebase = useContext(FirebaseContext)
 
     const isGoogleAuthed = Boolean(firebase.auth.currentUser?.providerData.find((pvd) => pvd.providerId === 'google.com'))
-
     const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
         clientId: FIREBASE_CLIENT_ID,
+        // iosClientId: FIREBASE_CLIENT_ID
     });
 
     useEffect(() => {
