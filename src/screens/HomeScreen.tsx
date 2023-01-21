@@ -1,7 +1,7 @@
 import { StyleSheet, Text } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { FirebaseContext } from '../providers/FirebaseContext';
-import { Button, Flex, ScrollView, Stack, View } from 'native-base';
+import { Button, ScrollView, Stack, View } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
 import { equalTo, onValue, orderByChild, query, ref } from 'firebase/database';
@@ -20,7 +20,7 @@ export default function HomeScreen({
   useEffect(() => {
     if (!uid) return
 
-    const q = query(ref(firebase.database, 'rooms'), orderByChild('owner'), equalTo(uid))
+    const q = query(ref(firebase.database, 'rooms'), orderByChild('owner/uid'), equalTo(uid))
     return onValue(q, (snapshot) => {
       const data = snapshot.val();
 

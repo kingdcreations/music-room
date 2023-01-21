@@ -1,11 +1,8 @@
 import { StyleSheet } from 'react-native';
-import { useContext, useEffect, useState } from 'react';
-import { FirebaseContext } from '../providers/FirebaseContext';
+import { useEffect, useState } from 'react';
 import { AspectRatio, Avatar, Button, Divider, VStack, HStack, IconButton, ScrollView, Text, View } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
-import { equalTo, onValue, orderByChild, query, ref } from 'firebase/database';
-import { Room, Track } from '../types/database';
 import SongItem from '../components/SongItem';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {
@@ -16,29 +13,10 @@ export default function RoomScreen({
   route, navigation
 }: HomeStackScreenProps<'Room'>) {
 
-  const firebase = useContext(FirebaseContext)
-  const [playlist, setPlaylist] = useState<Track[]>([])
-  const uid = firebase.auth.currentUser?.uid
   const [sound] = useState(new Audio.Sound())
   const [volume, setVolume] = useState(0)
 
-
-  useEffect(() => {
-    if (!uid) return
-
-    const playlistRef = ref(firebase.database, 'rooms/' + route.params.room.id + '/playlist');
-    return onValue(playlistRef, (snapshot) => {
-      const data = snapshot.val();
-      setPlaylist([])
-      if (snapshot.exists()) {
-        Object.values(data).map((song, i) => setPlaylist((oldSong) => {
-          const newSong:Track = song as Track;
-          newSong.id = Object.keys(data)[i]
-          return [...oldSong, newSong]
-        }));
-      }
-    });    
-  }, [])
+  const playlist = route.params.room.playlist && Object.values(route.params.room.playlist)
   
   const addSong = () => {
     navigation.navigate('AddSong', { room: route.params.room })
@@ -82,8 +60,6 @@ export default function RoomScreen({
     }
   }, []);
 
-  console.log(route.params.room);
-  
   return (
     <View style={styles.container}>
       <ScrollView w='100%' p={5}>
@@ -99,7 +75,7 @@ export default function RoomScreen({
             <Avatar marginRight={2} bg="green.500" size="xs" source={{
               uri: route.params.room.owner.photoURL || undefined
             }}>
-              {firebase.auth.currentUser?.displayName}
+              {route.params.room.owner.displayName}
             </Avatar>
             <Text fontSize={12}>{route.params.room.owner.displayName}</Text>
           </HStack>
@@ -129,11 +105,10 @@ export default function RoomScreen({
           </HStack>
 
           {/* Playlist songs */}
-          <Button>Add a song to begin</Button>
           <Text width='100%'>Up Next</Text>
           <Divider />
-          <VStack space={3} divider={<Divider />} w="90%">
-            {playlist.map((song, id) => <SongItem song={song} key={id}/>)}
+          <VStack space={3} marginBottom={5} divider={<Divider />} w="100%">
+            {playlist && playlist.map((song, id) => <SongItem song={song} key={id}/>)}
           </VStack>
           <Button onPress={addSong}>Add a song</Button>
         </Card>
