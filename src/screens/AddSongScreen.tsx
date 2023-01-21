@@ -16,7 +16,6 @@ export default function AddSongScreen({
   const [tracks, setTracks] = useState([])
 
   const firebase = useContext(FirebaseContext)
-  // const 
 
   const addToPlaylist = (track: any) => {
     var newtrack:Track = {
@@ -30,22 +29,15 @@ export default function AddSongScreen({
     const playlistRef = ref(firebase.database, 'rooms/' + route.params.room.id + '/playlist');
     console.log(route.params.room);
     const newSongRef = push(playlistRef);
-    set(newSongRef, track);
-    // push(ref(firebase.database + ), updates)
+    set(newSongRef, newtrack);
   }
 
   const searchTracks = () => {
-
     fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&type=video&q='
     + encodeURIComponent(search) + '&key=' + FIREBASE_API_KEY)
     .then(response => response.json())
-    .then((data) => {
-      setTracks(data.items)
-    })
-    .catch(error => {
-      console.log(error);
-    })
-
+    .then((data) => setTracks(data.items))
+    .catch(error => console.log(error))
   }
 
   return (
