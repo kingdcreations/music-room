@@ -2,6 +2,8 @@ import admin from "firebase-admin"
 import { DataSnapshot } from "@firebase/database-types"
 import { Track } from "../types"
 import ytdl from "ytdl-core";
+import path, { resolve } from "path";
+import fs from "fs";
 
 export default class Room {
     data: DataSnapshot
@@ -23,8 +25,8 @@ export default class Room {
         ref.on('child_added', (dataSnapshot) => {
             if (dataSnapshot.exists() && dataSnapshot.key) {
                 this.songs.set(dataSnapshot.key, dataSnapshot.val())
-
-                this.loadNextSong()
+                this.downloadSong(dataSnapshot.val())
+                    .then(() => this.loadNextSong())
             }
         })
 
@@ -33,11 +35,6 @@ export default class Room {
                 this.songs.delete(dataSnapshot.key)
             }
         })
-
-        admin.database().ref(`/rooms/${this.data.key}/currentSong`)
-            .on('child_removed', (dataSnapshot) => {
-                this.loadNextSong()
-            })
     }
 
     async loadCurrentSong() {
@@ -59,8 +56,6 @@ export default class Room {
     async loadNextSong() {
         const currentSongRef = admin.database().ref(`/rooms/${this.data.key}/currentSong`)
         const currentSong = (await currentSongRef.get()).val()
-        console.log(currentSong);
-
 
         // If there is no current song and a next song is available
         const nextSong = this.songs.entries().next().value;
@@ -71,6 +66,7 @@ export default class Room {
             // Remove the next song from the queue
             await admin.database()
                 .ref(`/rooms/${this.data.key}/playlist/${nextSongKey}`).remove()
+            console.log(`Removing ${nextSongData.title} from queue`);
 
             // Get song duration and launch function at the end
             const song = await ytdl.getBasicInfo(`https://www.youtube.com/watch?v=${nextSongData?.id}`)
@@ -93,11 +89,30 @@ export default class Room {
         }
     }
 
+    async downloadSong(song: Track) {
+        return new Promise<void>((resolve) => {
+            const output = path.resolve(__dirname, `../downloads/${song.id}.mp3`);
+            fs.access(output, fs.constants.F_OK, (err) => {
+                if (err) { // File not downloaded yet
+                    console.log(`Downloading from id ${song.id}`);
+
+                    const stream = ytdl(encodeURI(`https://www.youtube.com/watch?v=${song.id}`), {
+                        filter: 'audioonly',
+                    })
+                    stream.pipe(fs.createWriteStream(output))
+                    stream.on("finish", resolve);
+                } else {
+                    resolve()
+                }
+            })
+        })
+    }
+
     async onSongEnd() {
         console.log(`Removing ${this.currentSong?.title} from listening instance`);
 
         await admin.database().ref(`/rooms/${this.data.key}/currentSong`).remove()
         this.currentSong = null
-        // await this.loadNextSong()
+        await this.loadNextSong()
     }
 }

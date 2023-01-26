@@ -14,10 +14,8 @@ export default function PlaylistButton({ room }: { room: Room }) {
     return (
         <View w={{base: '50%', md: '25%'}} p='2'>
             <TouchableOpacity onPress={openRoom}>
-                <AspectRatio w="100%" ratio={1}>
-                    <View bgColor='gray.300' w="100%" h="100%">
-
-                    </View>
+                <AspectRatio bgColor='gray.300' w="100%" ratio={1}>
+                    
                 </AspectRatio>
                 <Text>{room.name}</Text>
             </TouchableOpacity>

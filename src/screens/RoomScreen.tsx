@@ -9,7 +9,7 @@ import {
   Audio,
 } from "expo-av";
 import { Track } from '../types/database';
-import { onChildAdded, onChildChanged, onChildRemoved, ref } from 'firebase/database';
+import { onChildAdded, onChildChanged, onChildRemoved, onValue, ref } from 'firebase/database';
 import { FirebaseContext } from '../providers/FirebaseContext';
 
 export default function RoomScreen({
@@ -17,11 +17,10 @@ export default function RoomScreen({
 }: HomeStackScreenProps<'Room'>) {
   const firebase = useContext(FirebaseContext)
   const [currentSong, setCurrentSong] = useState<Track | null>(null)
+  const [queue, setQueue] = useState<Track[]>([])
 
   const [sound] = useState(new Audio.Sound())
-  const [volume, setVolume] = useState(0)
-
-  const playlist = route.params.room.playlist && Object.values(route.params.room.playlist)
+  const [volume, setVolume] = useState(1)
 
   const addSong = () => {
     navigation.navigate('AddSong', { room: route.params.room })
@@ -35,11 +34,16 @@ export default function RoomScreen({
   const load = async () => {
     const { currentSong, currentTime } = await realtimeSongSync()
     setCurrentSong(currentSong)
-
+    
     if (currentSong) {
-      await sound.loadAsync({ uri: `http://10.0.0.3:3000/song/${currentSong.id}` });
-      await sound.playFromPositionAsync(currentTime)
-      await sound.setVolumeAsync(0)
+      try {
+        await sound.unloadAsync();
+        await sound.loadAsync({ uri: `http://10.0.0.3:3000/song/${currentSong.id}` });
+        await sound.playFromPositionAsync(currentTime)
+        await sound.setVolumeAsync(1)
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
@@ -79,16 +83,22 @@ export default function RoomScreen({
     }
   }, []);
 
+  // Update songs
   useEffect(() => {
-    const currentSongRef = ref(firebase.database, 'rooms/' + route.params.room.id + "/currentSong");
-    return onChildAdded(currentSongRef, (data, key) => {
+    const currentSongRef = ref(firebase.database, 'rooms/' + route.params.room.id + '/currentSong');
+    return onValue(currentSongRef, (childSnapshot) => {
+      const song = childSnapshot.val()
+      setCurrentSong(song)
+      if (song) load()
     });
   }, [])
 
+  // Update queue
   useEffect(() => {
-    const currentSongRef = ref(firebase.database, 'rooms/' + route.params.room.id + "/currentSong");
-    return onChildRemoved(currentSongRef, () => {
-      setCurrentSong(null)
+    const queueRef = ref(firebase.database, 'rooms/' + route.params.room.id + '/playlist');
+    return onValue(queueRef, (childSnapshot) => {
+      const queue = childSnapshot.val()
+      setQueue(queue && Object.values(queue))
     });
   }, [])
 
@@ -141,7 +151,7 @@ export default function RoomScreen({
           {/* Playlist songs */}
           <Divider />
           <VStack space={3} marginBottom={5} divider={<Divider />} w="100%">
-            {playlist && playlist.map((song, id) => <SongItem song={song} key={id} />)}
+            {queue && queue.map((song, id) => <SongItem song={song} key={id} />)}
           </VStack>
           <Button onPress={addSong}>Add a song</Button>
         </Card>

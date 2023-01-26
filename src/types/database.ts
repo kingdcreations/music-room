@@ -15,4 +15,5 @@ export type Room = {
     };
     private: boolean;
     playlist: Track[];
+    currentSong?: Track;
 };

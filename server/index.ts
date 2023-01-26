@@ -35,21 +35,7 @@ app.get("/song/:id", (req, res) => {
   });
 
   const output = path.resolve(__dirname, `downloads/${req.params.id}.mp3`);
-  fs.access(output, fs.constants.F_OK, (err) => {
-    if (err) { // File not downloaded yet
-      console.log(`Downloading from id ${req.params.id}`);
-
-      const stream = ytdl(encodeURI(`https://www.youtube.com/watch?v=${req.params.id}`), {
-        filter: 'audioonly',
-      }).pipe(fs.createWriteStream(output))
-
-      stream.on('finish', () => {
-        res.sendFile(output)
-      })
-    } else { // Serve file
-      res.sendFile(output)
-    }
-  })
+  res.sendFile(output)
 })
 
 app.get("/room/:key", (req, res) => {

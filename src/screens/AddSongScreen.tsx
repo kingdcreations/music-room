@@ -27,7 +27,6 @@ export default function AddSongScreen({
     var updates:{[id:string] : Track} = {};
     updates['rooms/' + route.params.room.id + '/playlist'] = newtrack;
     const playlistRef = ref(firebase.database, 'rooms/' + route.params.room.id + '/playlist');
-    console.log(route.params.room);
     const newSongRef = push(playlistRef);
     set(newSongRef, newtrack);
   }
