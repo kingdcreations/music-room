@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
-import { useEffect, useState } from 'react';
-import { AspectRatio, Avatar, Button, Divider, VStack, HStack, IconButton, ScrollView, Text, View } from 'native-base';
+import { useContext, useEffect, useState } from 'react';
+import { AspectRatio, Avatar, Button, Divider, VStack, HStack, IconButton, ScrollView, Text, View, Image } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
 import SongItem from '../components/SongItem';
@@ -8,34 +8,53 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import {
   Audio,
 } from "expo-av";
+import { Track } from '../types/database';
+import { onChildAdded, onChildChanged, onChildRemoved, ref } from 'firebase/database';
+import { FirebaseContext } from '../providers/FirebaseContext';
 
 export default function RoomScreen({
   route, navigation
 }: HomeStackScreenProps<'Room'>) {
+  const firebase = useContext(FirebaseContext)
+  const [currentSong, setCurrentSong] = useState<Track | null>(null)
 
   const [sound] = useState(new Audio.Sound())
   const [volume, setVolume] = useState(0)
 
   const playlist = route.params.room.playlist && Object.values(route.params.room.playlist)
-  
+
   const addSong = () => {
     navigation.navigate('AddSong', { room: route.params.room })
   }
 
+  const realtimeSongSync = async () => {
+    return await fetch(`http://10.0.0.3:3000/room/${route.params.room.id}`)
+      .then((res) => res.json())
+  }
+
   const load = async () => {
-    await sound.loadAsync({ uri: 'http://10.0.0.3:3000/song/Te3_VlimRw0' });
-    await sound.playAsync();
-    await sound.setVolumeAsync(0)
+    const { currentSong, currentTime } = await realtimeSongSync()
+    setCurrentSong(currentSong)
+
+    if (currentSong) {
+      await sound.loadAsync({ uri: `http://10.0.0.3:3000/song/${currentSong.id}` });
+      await sound.playFromPositionAsync(currentTime)
+      await sound.setVolumeAsync(0)
+    }
   }
 
   const play = async () => {
-    await sound.setVolumeAsync(1)
-    setVolume(1)
+    if (currentSong) {
+      await sound.setVolumeAsync(1)
+      setVolume(1)
+    }
   }
 
   const pause = async () => {
-    await sound.setVolumeAsync(0)
-    setVolume(0)
+    if (currentSong) {
+      await sound.setVolumeAsync(0)
+      setVolume(0)
+    }
   }
 
   const stop = async () => {
@@ -60,15 +79,28 @@ export default function RoomScreen({
     }
   }, []);
 
+  useEffect(() => {
+    const currentSongRef = ref(firebase.database, 'rooms/' + route.params.room.id + "/currentSong");
+    return onChildAdded(currentSongRef, (data, key) => {
+    });
+  }, [])
+
+  useEffect(() => {
+    const currentSongRef = ref(firebase.database, 'rooms/' + route.params.room.id + "/currentSong");
+    return onChildRemoved(currentSongRef, () => {
+      setCurrentSong(null)
+    });
+  }, [])
+
   return (
     <View style={styles.container}>
       <ScrollView w='100%' p={5}>
         <Card>
           {/* Playlist info */}
-          <AspectRatio w="50%" ratio={1}>
-            <View bgColor='gray.300' w="100%" h="100%">
-
-            </View>
+          <AspectRatio w="50%" bgColor='gray.300' ratio={1}>
+            <Image
+              src={currentSong?.thumbnailUrl}
+              alt="Current song's thumbnail" />
           </AspectRatio>
 
           <HStack alignItems="center">
@@ -104,11 +136,12 @@ export default function RoomScreen({
             }} />
           </HStack>
 
+          {currentSong && <SongItem song={currentSong} playing />}
+
           {/* Playlist songs */}
-          <Text width='100%'>Up Next</Text>
           <Divider />
           <VStack space={3} marginBottom={5} divider={<Divider />} w="100%">
-            {playlist && playlist.map((song, id) => <SongItem song={song} key={id}/>)}
+            {playlist && playlist.map((song, id) => <SongItem song={song} key={id} />)}
           </VStack>
           <Button onPress={addSong}>Add a song</Button>
         </Card>

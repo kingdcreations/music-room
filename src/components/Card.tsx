@@ -1,6 +1,6 @@
 import { VStack } from 'native-base';
 
-export default function Card({ children }: { children: JSX.Element | JSX.Element[] }) {
+export default function Card({ children }: { children: React.ReactNode }) {
     return (
         <VStack
             children={children}

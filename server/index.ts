@@ -14,15 +14,15 @@ admin.initializeApp({
   databaseURL: "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app"
 });
 
-const rooms = new Map()
+const rooms = new Map<string, Room>()
 
 const db = admin.database().ref('/rooms/')
-db.on('child_added', function(dataSnapshot) { 
-  rooms.set(dataSnapshot.key, new Room(dataSnapshot))
+db.on('child_added', (dataSnapshot) => { 
+  if (dataSnapshot.key) rooms.set(dataSnapshot.key, new Room(dataSnapshot))
 })
 
-db.on('child_removed', function(dataSnapshot) { 
-  rooms.delete(dataSnapshot.key)
+db.on('child_removed', (dataSnapshot) => { 
+  if (dataSnapshot.key) rooms.delete(dataSnapshot.key)
 })
 
 const downloadsDir = path.resolve(__dirname, `downloads`);
@@ -53,7 +53,7 @@ app.get("/song/:id", (req, res) => {
 })
 
 app.get("/room/:key", (req, res) => {
-  res.json(rooms.get(req.params.key))
+  res.json(rooms.get(req.params.key)?.getCurrentSongStream())
 })
 
 const server = http.createServer(app)
