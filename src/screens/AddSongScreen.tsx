@@ -2,7 +2,7 @@ import { StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useContext, useState } from 'react';
 import { Button, HStack, Icon, Image, Input, ScrollView, Text, View, VStack } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { FirebaseContext } from '../providers/FirebaseContext';
+import { FirebaseContext } from '../providers/FirebaseProvider';
 import { FIREBASE_API_KEY } from '@env';
 import { Track } from '../types/database';
 import { HomeStackScreenProps } from '../types';

@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { RootStackScreenProps } from '../types';
-import { FirebaseContext } from '../providers/FirebaseContext';
+import { FirebaseContext } from '../providers/FirebaseProvider';
 import { GoogleAuthProvider, signInWithCredential, signInWithEmailAndPassword } from "firebase/auth";
 import * as Google from 'expo-auth-session/providers/google';
 import { Input, Button, FormControl, Text, Divider, Icon, ScrollView } from 'native-base';

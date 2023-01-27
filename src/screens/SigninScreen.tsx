@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { useContext, useState } from 'react';
-import { FirebaseContext } from '../providers/FirebaseContext';
+import { FirebaseContext } from '../providers/FirebaseProvider';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { RootStackScreenProps } from '../types';
 import { Button, FormControl, Input, ScrollView, useToast } from 'native-base';

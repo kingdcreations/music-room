@@ -1,10 +1,9 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { StatusBar } from 'expo-status-bar';
 import { RootStackParamList } from '../types';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { FirebaseContext } from '../providers/FirebaseContext';
+import { FirebaseContext } from '../providers/FirebaseProvider';
 import LoginScreen from '../screens/LoginScreen'
 import SigninScreen from '../screens/SigninScreen'
 import RecoverScreen from '../screens/RecoverScreen';
@@ -13,6 +12,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import SearchScreen from '../screens/SearchScreen';
 import AccountScreen from '../screens/AccountScreen';
 import HomeStack from './HomeStack';
+import { Text } from 'native-base';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const RootStack = createBottomTabNavigator<RootStackParamList>();
@@ -60,7 +60,6 @@ export default function Navigation() {
                     <Stack.Screen name="Recover" component={RecoverScreen} />
                 </Stack.Navigator>
             }
-            <StatusBar style="auto" />
         </NavigationContainer>
     );
 }

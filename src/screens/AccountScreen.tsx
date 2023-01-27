@@ -1,7 +1,7 @@
 import { Alert, StyleSheet, Text } from 'react-native';
 import { signOut } from 'firebase/auth';
 import { useContext, useState } from 'react';
-import { FirebaseContext } from '../providers/FirebaseContext';
+import { FirebaseContext } from '../providers/FirebaseProvider';
 import { Avatar, Button, Divider, Input, ScrollView, useToast } from "native-base";
 import Card from '../components/Card';
 import GoogleAuthButton from '../components/GoogleAuthButton';

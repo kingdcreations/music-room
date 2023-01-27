@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import { Icon, Input, ScrollView, Stack, Text } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { FirebaseContext } from '../providers/FirebaseContext';
+import { FirebaseContext } from '../providers/FirebaseProvider';
 import Card from '../components/Card';
 import { equalTo, onValue, orderByChild, query, ref } from 'firebase/database';
 import { Room } from '../types/database';

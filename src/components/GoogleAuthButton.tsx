@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { FirebaseContext } from '../providers/FirebaseContext';
+import { FirebaseContext } from '../providers/FirebaseProvider';
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import * as Google from 'expo-auth-session/providers/google';
 import { Button, Icon } from 'native-base';

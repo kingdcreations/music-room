@@ -13,9 +13,9 @@ export default function SongItem({ song, playing }: { song: Track, playing?: boo
           }} alt="Alternate Text" />
         <VStack flexGrow={1} flexShrink={1}>
           {playing ?
-            <Text variant="primary" bold isTruncated color="primary.600">{song.title}</Text>
+            <Text bold isTruncated color="primary.600">{song.title}</Text>
             :
-            <Text variant="primary" bold isTruncated>{song.title}</Text>
+            <Text bold isTruncated>{song.title}</Text>
           }
           <Text isTruncated>{song.author}</Text>
         </VStack>

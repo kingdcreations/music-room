@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
-import { FirebaseContext } from '../providers/FirebaseContext';
+import { FirebaseContext } from '../providers/FirebaseProvider';
 import { Button, ScrollView, Stack, View } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';

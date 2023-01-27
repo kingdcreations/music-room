@@ -1,26 +1,27 @@
 import { StyleSheet } from 'react-native';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import { AspectRatio, Avatar, Button, Divider, VStack, HStack, IconButton, ScrollView, Text, View, Image } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
 import SongItem from '../components/SongItem';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import {
-  Audio,
-} from "expo-av";
+import { Audio } from "expo-av";
 import { Track } from '../types/database';
-import { onChildAdded, onChildChanged, onChildRemoved, onValue, ref } from 'firebase/database';
-import { FirebaseContext } from '../providers/FirebaseContext';
+import { onValue, ref } from 'firebase/database';
+import { FirebaseContext } from '../providers/FirebaseProvider';
+import { AudioContext } from '../providers/AudioProvider';
 
 export default function RoomScreen({
   route, navigation
 }: HomeStackScreenProps<'Room'>) {
   const firebase = useContext(FirebaseContext)
+  const audio = useContext(AudioContext)
   const [currentSong, setCurrentSong] = useState<Track | null>(null)
   const [queue, setQueue] = useState<Track[]>([])
 
-  const [sound] = useState(new Audio.Sound())
-  const [volume, setVolume] = useState(1)
+  const [volume, setVolume] = useState(0)
+
+  console.log(audio);
 
   const addSong = () => {
     navigation.navigate('AddSong', { room: route.params.room })
@@ -37,10 +38,10 @@ export default function RoomScreen({
 
     if (currentSong) {
       try {
-        await sound.unloadAsync();
-        await sound.loadAsync({ uri: `http://10.0.0.3:3000/song/${currentSong.id}` });
-        await sound.playFromPositionAsync(currentTime)
-        await sound.setVolumeAsync(1)
+        // await sound.unloadAsync();
+        // await sound.loadAsync({ uri: `http://10.0.0.3:3000/song/${currentSong.id}` });
+        // await sound.playFromPositionAsync(currentTime)
+        // await sound.setVolumeAsync(1)
       } catch (e) {
         console.log(e);
       }
@@ -48,33 +49,20 @@ export default function RoomScreen({
   }
 
   const play = async () => {
-    if (currentSong) {
-      await sound.setVolumeAsync(1)
-      setVolume(1)
-    }
+    audio.play(currentSong)
   }
 
   const pause = async () => {
-    if (currentSong) {
-      await sound.setVolumeAsync(0)
-      setVolume(0)
-    }
+    // if (currentSong) {
+    //   await sound.setVolumeAsync(0)
+    //   setVolume(0)
+    // }
   }
 
   const stop = async () => {
-    await sound.unloadAsync();
-    setVolume(0)
+    // await sound.unloadAsync();
+    // setVolume(0)
   }
-
-  // Load sound on screen focus
-  useEffect(() => {
-    return navigation.addListener('focus', () => load());
-  }, [navigation]);
-
-  // Stop sound on change screen
-  useEffect(() => {
-    return navigation.addListener('blur', () => stop());
-  }, [navigation]);
 
   // Stop sound on component unload
   useEffect(() => {
