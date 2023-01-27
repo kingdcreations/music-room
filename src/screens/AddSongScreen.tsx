@@ -22,6 +22,7 @@ export default function AddSongScreen({
       title: track.snippet.title,
       author: track.snippet.channelTitle,
       thumbnailUrl: track.snippet.thumbnails.default.url,
+      vote: 0
     }
     firebase.addSongToPlaylist(newtrack, route.params.room.id)
   }
