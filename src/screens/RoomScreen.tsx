@@ -5,7 +5,6 @@ import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
 import SongItem from '../components/SongItem';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Audio } from "expo-av";
 import { Track } from '../types/database';
 import { onValue, ref } from 'firebase/database';
 import { FirebaseContext } from '../providers/FirebaseProvider';
@@ -19,57 +18,27 @@ export default function RoomScreen({
   const [currentSong, setCurrentSong] = useState<Track | null>(null)
   const [queue, setQueue] = useState<Track[]>([])
 
-  const [volume, setVolume] = useState(0)
-
-  console.log(audio);
+  const [state, setState] = useState<'playing' | 'waiting' | 'stopped' | 'loading'>('stopped')
 
   const addSong = () => {
     navigation.navigate('AddSong', { room: route.params.room })
   }
 
-  const realtimeSongSync = async () => {
-    return await fetch(`http://10.0.0.3:3000/room/${route.params.room.id}`)
-      .then((res) => res.json())
-  }
-
-  const load = async () => {
-    const { currentSong, currentTime } = await realtimeSongSync()
-    setCurrentSong(currentSong)
-
-    if (currentSong) {
-      try {
-        // await sound.unloadAsync();
-        // await sound.loadAsync({ uri: `http://10.0.0.3:3000/song/${currentSong.id}` });
-        // await sound.playFromPositionAsync(currentTime)
-        // await sound.setVolumeAsync(1)
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }
-
   const play = async () => {
-    audio.play(currentSong)
-  }
-
-  const pause = async () => {
-    // if (currentSong) {
-    //   await sound.setVolumeAsync(0)
-    //   setVolume(0)
-    // }
+    const { currentSong, currentTime } = await fetch(`http://10.0.0.3:3000/room/${route.params.room.id}`)
+      .then((res) => res.json())
+      
+    if (currentSong) {
+      setState('playing')
+      await audio?.play(currentSong, currentTime, route.params.room.id)
+      setCurrentSong(currentSong)
+    }
   }
 
   const stop = async () => {
-    // await sound.unloadAsync();
-    // setVolume(0)
+    setState('stopped')
+    await audio?.stop()
   }
-
-  // Stop sound on component unload
-  useEffect(() => {
-    return () => {
-      stop()
-    }
-  }, []);
 
   // Update songs
   useEffect(() => {
@@ -77,9 +46,9 @@ export default function RoomScreen({
     return onValue(currentSongRef, (childSnapshot) => {
       const song = childSnapshot.val()
       setCurrentSong(song)
-      if (song) load()
+      if (audio?.roomID === route.params.room.id) play()
     });
-  }, [])
+  }, [audio?.roomID])
 
   // Update queue
   useEffect(() => {
@@ -117,8 +86,8 @@ export default function RoomScreen({
               size: '5',
               name: "person-add-outline"
             }} />
-            {volume ?
-              <IconButton onPress={pause} size='40px' variant="solid" _icon={{
+            {audio?.roomID === route.params.room.id ?
+              <IconButton onPress={stop} size='40px' variant="solid" _icon={{
                 as: Ionicons,
                 name: "stop-outline"
               }} />

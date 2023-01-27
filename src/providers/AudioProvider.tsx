@@ -1,56 +1,69 @@
-import { AspectRatio, HStack, IconButton, Image, Text, VStack } from 'native-base';
-import { createContext } from 'react';
-import AudioPlayer from './AudioContext';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet } from 'react-native';
+import { createContext, useEffect, useState } from 'react';
+import { Track } from '../types/database';
+import AudioController from '../components/AudioController';
+import { Audio } from 'expo-av';
 
-const audio = new AudioPlayer()
-export const AudioContext = createContext(audio)
+export const AudioContext = createContext<
+    {
+        data: Track | null;
+        setData: React.Dispatch<React.SetStateAction<Track | null>>;
+        sound: Audio.Sound | undefined;
+        play: (currentSong: Track, currentTime: number, roomID: string) => Promise<void>;
+        stop: () => Promise<void>;
+        roomID: string | null;
+    } | undefined
+>(undefined)
 
 export default function AudioProvider({ children }: { children: React.ReactNode }) {
-    console.log(audio);
-    
+    const [sound, setSound] = useState<Audio.Sound>();
+    const [roomID, setRoomID] = useState<string | null>(null)
+    const [data, setData] = useState<Track | null>(null)
 
+    const stop = async () => {
+        sound && await sound.unloadAsync()
+        setData(null)
+        setRoomID(null)
+    }
+
+    const play = async (currentSong: Track, currentTime: number, roomID: string) => {
+        try {
+            if (sound) {
+                await sound.unloadAsync();
+            }
+
+            if (currentSong) {
+                setData(currentSong)
+                setRoomID(roomID)
+                const { sound } = await Audio.Sound.createAsync({
+                    uri: `http://10.0.0.3:3000/song/${currentSong.id}`
+                })
+                setSound(sound);
+                await sound.playFromPositionAsync(currentTime)
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    useEffect(() => {
+        sound?.setOnPlaybackStatusUpdate(playbackStatus => {
+            if (playbackStatus.isLoaded) {
+                if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
+                    setData(null)
+                }
+            }
+        })
+
+        return sound && (() => {
+            sound.unloadAsync();
+        })
+    }, [sound]);
+
+    const value = { play, stop, roomID, sound, data, setData }
     return (
-        <AudioContext.Provider value={audio}>
+        <AudioContext.Provider value={value}>
             {children}
-
-            <HStack
-                style={styles.container}
-                bgColor="gray.300"
-                w='100%'
-                space={3}
-                py={1.5}
-                px={3}
-            >
-                <AspectRatio bgColor='gray.500' h="100%" ratio={1}>
-                    <Image src={audio.data?.thumbnailUrl} alt="Song illustration" />
-                </AspectRatio>
-
-                <VStack justifyContent="center">
-                    <Text fontSize={12} bold isTruncated>{audio.data?.title}</Text>
-                    <Text fontSize={12} isTruncated>{audio.data?.author}</Text>
-                    <Text fontSize={12} isTruncated>{JSON.stringify(audio.data)}</Text>
-                </VStack>
-
-                <IconButton onPress={audio.stop} marginLeft="auto" size='40px' variant='none' _icon={{
-                    as: Ionicons,
-                    size: '25px',
-                    name: "close"
-                }} />
-            </HStack>
-
+            <AudioController {...value} />
         </AudioContext.Provider>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        position: 'absolute',
-        height: 50,
-        borderTopRightRadius: 5,
-        borderTopLeftRadius: 5,
-        paddingHorizontal: 5,
-        bottom: 50,
-    },
-});
