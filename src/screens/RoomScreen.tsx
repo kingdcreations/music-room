@@ -34,7 +34,7 @@ export default function RoomScreen({
   const load = async () => {
     const { currentSong, currentTime } = await realtimeSongSync()
     setCurrentSong(currentSong)
-    
+
     if (currentSong) {
       try {
         await sound.unloadAsync();
@@ -85,7 +85,7 @@ export default function RoomScreen({
 
   // Update songs
   useEffect(() => {
-    const currentSongRef = ref(firebase.database, 'rooms/' + route.params.room.id + '/currentSong');
+    const currentSongRef = ref(firebase.database, 'playlists/' + route.params.room.id + '/currentSong');
     return onValue(currentSongRef, (childSnapshot) => {
       const song = childSnapshot.val()
       setCurrentSong(song)
@@ -95,10 +95,10 @@ export default function RoomScreen({
 
   // Update queue
   useEffect(() => {
-    const queueRef = ref(firebase.database, 'rooms/' + route.params.room.id + '/playlist');
+    const queueRef = ref(firebase.database, 'playlists/' + route.params.room.id + '/queue');
     return onValue(queueRef, (childSnapshot) => {
       const queue = childSnapshot.val()
-      setQueue(queue && Object.values(queue))
+      setQueue(queue ? Object.values(queue) : [])
     });
   }, [])
 
@@ -151,7 +151,7 @@ export default function RoomScreen({
           {/* Playlist songs */}
           <Divider />
           <VStack space={3} marginBottom={5} divider={<Divider />} w="100%">
-            {queue && queue.map((song, id) => <SongItem song={song} key={id} />)}
+            {queue.map((song, id) => <SongItem song={song} key={id} />)}
           </VStack>
           <Button onPress={addSong}>Add a song</Button>
         </Card>

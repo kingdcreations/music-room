@@ -23,7 +23,7 @@ export type HomeStackParamList = {
     Home: undefined;
     Room: { room: Room };
     AddSong: { room: Room };
-    NewRoom: undefined;
+    AddRoom: undefined;
 };
 
 export type HomeStackScreenProps<Screen extends keyof HomeStackParamList> =

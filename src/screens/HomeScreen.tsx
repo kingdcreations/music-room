@@ -43,7 +43,7 @@ export default function HomeScreen({
           <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
             {rooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
           </Stack>
-          <Button w="100%" colorScheme='emerald' onPress={() => navigation.navigate('NewRoom')}>New room</Button>
+          <Button w="100%" colorScheme='emerald' onPress={() => navigation.navigate('AddRoom')}>New room</Button>
         </Card>
 
         <Card>
@@ -54,7 +54,6 @@ export default function HomeScreen({
         </Card>
       </ScrollView>
     </View>
-
   );
 }
 

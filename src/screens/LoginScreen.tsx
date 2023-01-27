@@ -65,7 +65,7 @@ export default function LoginScreen({
       </Card>
 
       <Card>
-        <Text >No account yet?</Text>
+        <Text>No account yet?</Text>
         <Button w="100%" onPress={signin}>Sign in</Button>
       </Card>
     </ScrollView>

@@ -14,6 +14,5 @@ export type Room = {
         photoURL: string,
     };
     private: boolean;
-    playlist: Track[];
     currentSong?: Track;
 };

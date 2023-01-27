@@ -1,7 +1,7 @@
 import React from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
-import NewRoomScreen from '../screens/NewRoomScreen';
+import AddRoomScreen from '../screens/AddRoomScreen';
 import { HomeStackParamList } from '../types';
 import RoomScreen from '../screens/RoomScreen';
 import AddSongScreen from '../screens/AddSongScreen';
@@ -30,8 +30,8 @@ export default function HomeStack() {
         options={({ route }) => ({ title: route.params.room.name })}
       />
       <HomeStack.Screen
-        name="NewRoom"
-        component={NewRoomScreen}
+        name="AddRoom"
+        component={AddRoomScreen}
         options={{
           title: 'New Room',
         }}

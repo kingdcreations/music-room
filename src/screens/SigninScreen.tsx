@@ -19,13 +19,13 @@ export default function SigninScreen({
 
   const signin = () => {
     createUserWithEmailAndPassword(firebase.auth, mail, pass)
-    .then(() => {
-      addDoc(collection(firebase.firestore, 'users'), {
-        uid: firebase.auth.currentUser?.uid,
-        mail: firebase.auth.currentUser?.email,
-        verified: firebase.auth.currentUser?.emailVerified,
+      .then(() => {
+        addDoc(collection(firebase.firestore, 'users'), {
+          uid: firebase.auth.currentUser?.uid,
+          mail: firebase.auth.currentUser?.email,
+          verified: firebase.auth.currentUser?.emailVerified,
+        })
       })
-    })
       .catch(e => toast.show({ description: e.code }))
   }
 

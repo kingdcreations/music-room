@@ -1,16 +1,15 @@
-import { StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
-import { AspectRatio, Button, Flex, HStack, Icon, Image, Input, ScrollView, Stack, Text, View, VStack } from 'native-base';
+import { StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { Button, HStack, Icon, Image, Input, ScrollView, Text, View, VStack } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FirebaseContext } from '../providers/FirebaseContext';
 import { FIREBASE_API_KEY } from '@env';
 import { Track } from '../types/database';
 import { HomeStackScreenProps } from '../types';
-import { update, ref, push, set } from 'firebase/database';
 
 
 export default function AddSongScreen({
-  route, navigation
+  route
 }: HomeStackScreenProps<'AddSong'>) {
   const [search, setSearch] = useState("")
   const [tracks, setTracks] = useState([])
@@ -18,25 +17,21 @@ export default function AddSongScreen({
   const firebase = useContext(FirebaseContext)
 
   const addToPlaylist = (track: any) => {
-    var newtrack:Track = {
+    var newtrack: Track = {
       id: track.id.videoId,
       title: track.snippet.title,
       author: track.snippet.channelTitle,
       thumbnailUrl: track.snippet.thumbnails.default.url,
     }
-    var updates:{[id:string] : Track} = {};
-    updates['rooms/' + route.params.room.id + '/playlist'] = newtrack;
-    const playlistRef = ref(firebase.database, 'rooms/' + route.params.room.id + '/playlist');
-    const newSongRef = push(playlistRef);
-    set(newSongRef, newtrack);
+    firebase.addSongToPlaylist(newtrack, route.params.room.id)
   }
 
   const searchTracks = () => {
     fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&type=video&q='
-    + encodeURIComponent(search) + '&key=' + FIREBASE_API_KEY)
-    .then(response => response.json())
-    .then((data) => setTracks(data.items))
-    .catch(error => console.log(error))
+      + encodeURIComponent(search) + '&key=' + FIREBASE_API_KEY)
+      .then(response => response.json())
+      .then((data) => setTracks(data.items))
+      .catch(error => console.log(error))
   }
 
   return (
@@ -45,7 +40,7 @@ export default function AddSongScreen({
         py={3}
         value={search}
         onChangeText={setSearch}
-        
+
         InputLeftElement={
           <Icon as={<Ionicons name="search" />} size={5} ml="3" color="muted.400" />
         }
@@ -54,7 +49,7 @@ export default function AddSongScreen({
       <ScrollView w="100%">
         <VStack w="100%" alignItems='center' p={4} space='4'>
           {tracks.map((track: any, i) => (
-          <TouchableOpacity key={i} onPress={() => addToPlaylist(track)}>
+            <TouchableOpacity key={i} onPress={() => addToPlaylist(track)}>
               <HStack w="100%" space="4" alignItems='center'>
                 <Image
                   size='sm'

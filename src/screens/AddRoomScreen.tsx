@@ -6,9 +6,9 @@ import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
 import { push, ref, set } from 'firebase/database';
 
-export default function NewRoomScreen({
+export default function AddRoomScreen({
   navigation
-}: HomeStackScreenProps<'NewRoom'>) {
+}: HomeStackScreenProps<'AddRoom'>) {
   const firebase = useContext(FirebaseContext)
   const [roomName, setRoomName] = useState(firebase.auth.currentUser?.displayName + "'s room")
   const [privateRoom, setPrivate] = useState(false)
@@ -22,7 +22,6 @@ export default function NewRoomScreen({
         displayName: firebase.auth.currentUser?.displayName,
         photoURL: firebase.auth.currentUser?.photoURL
       },
-      playlist: []
     })
     navigation.goBack()
   }
