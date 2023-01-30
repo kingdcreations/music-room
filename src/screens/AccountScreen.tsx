@@ -1,10 +1,11 @@
-import { Alert, StyleSheet, Text } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { signOut } from 'firebase/auth';
 import { useContext, useState } from 'react';
 import { FirebaseContext } from '../providers/FirebaseProvider';
-import { Avatar, Button, Divider, Input, ScrollView, useToast } from "native-base";
+import { Avatar, Button, Divider, Input, ScrollView, useToast, Text } from "native-base";
 import Card from '../components/Card';
 import GoogleAuthButton from '../components/GoogleAuthButton';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 export default function AccountScreen() {
   const [curPass, setCurPass] = useState("")
@@ -44,7 +45,7 @@ export default function AccountScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container} mx={5}>
       <Card>
-        <Avatar bg="green.500" size="xl" source={{
+        <Avatar bg={Colors.primary} size="xl" source={{
           uri: firebase.auth.currentUser?.photoURL || undefined
         }}>
           {firebase.auth.currentUser?.displayName}
@@ -65,7 +66,7 @@ export default function AccountScreen() {
 
         <Divider />
 
-        <Button w="100%" colorScheme="error" onPress={logout}>Log out</Button>
+        <Button w="100%" colorScheme="danger" onPress={logout}>Log out</Button>
       </Card>
     </ScrollView>
   );

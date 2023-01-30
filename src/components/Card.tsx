@@ -1,15 +1,15 @@
 import { VStack } from 'native-base';
 
-export default function Card({ children }: { children: React.ReactNode }) {
+export default function Card(props: any) {
     return (
         <VStack
-            children={children}
             space={2.5}
             w='100%'
             mb={5}
             justifyContent='center'
             alignItems='center'
             maxWidth='750px'
+            {...props}
         />
     )
 }

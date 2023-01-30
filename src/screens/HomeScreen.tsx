@@ -1,7 +1,7 @@
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { FirebaseContext } from '../providers/FirebaseProvider';
-import { Button, ScrollView, Stack, View } from 'native-base';
+import { Button, ScrollView, Stack, View, Text } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
 import { equalTo, onValue, orderByChild, query, ref } from 'firebase/database';
@@ -43,7 +43,7 @@ export default function HomeScreen({
           <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
             {rooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
           </Stack>
-          <Button w="100%" colorScheme='emerald' onPress={() => navigation.navigate('AddRoom')}>New room</Button>
+          <Button w="100%" onPress={() => navigation.navigate('AddRoom')}>New room</Button>
         </Card>
 
         <Card>

@@ -12,7 +12,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import SearchScreen from '../screens/SearchScreen';
 import AccountScreen from '../screens/AccountScreen';
 import HomeStack from './HomeStack';
-import { Text } from 'native-base';
+import colors from '../constants/Colors';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const RootStack = createBottomTabNavigator<RootStackParamList>();
@@ -23,14 +23,24 @@ export default function Navigation() {
 
     useEffect(() => onAuthStateChanged(firebase.auth, (u) => setUser(u)), []);
 
+    const theme = {
+        dark: true,
+        colors
+    };
+
     return (
-        <NavigationContainer>
+        <NavigationContainer theme={theme}>
             {user ?
                 <RootStack.Navigator
                     initialRouteName="HomeRoot"
                     screenOptions={({ route }) => ({
-                        tabBarActiveTintColor: 'tomato',
                         tabBarInactiveTintColor: 'gray',
+                        tabBarStyle:{
+                          height: 65,
+                        },
+                        tabBarItemStyle:{
+                          margin: 10,
+                        },
                         tabBarIcon: ({ color, size }) => {
                             if (route.name === 'HomeRoot') {
                                 return <Ionicons name='home' size={size} color={color} />;

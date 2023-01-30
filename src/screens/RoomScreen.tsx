@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { useContext, useEffect, useState, useRef } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AspectRatio, Avatar, Button, Divider, VStack, HStack, IconButton, ScrollView, Text, View, Image } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
@@ -9,6 +9,7 @@ import { Track } from '../types/database';
 import { onValue, ref, query, orderByChild } from 'firebase/database';
 import { FirebaseContext } from '../providers/FirebaseProvider';
 import { AudioContext } from '../providers/AudioProvider';
+import Colors from '../constants/Colors';
 
 export default function RoomScreen({
   route, navigation
@@ -17,8 +18,6 @@ export default function RoomScreen({
   const audio = useContext(AudioContext)
   const [currentSong, setCurrentSong] = useState<Track | null>(null)
   const [queue, setQueue] = useState<Track[]>([])
-
-  const [state, setState] = useState<'playing' | 'waiting' | 'stopped' | 'loading'>('stopped')
 
   const addSong = () => {
     navigation.navigate('AddSong', { room: route.params.room })
@@ -29,14 +28,12 @@ export default function RoomScreen({
       .then((res) => res.json())
       
     if (currentSong) {
-      setState('playing')
       await audio?.play(currentSong, currentTime, route.params.room.id)
       setCurrentSong(currentSong)
     }
   }
 
   const stop = async () => {
-    setState('stopped')
     await audio?.stop()
   }
 
@@ -72,14 +69,14 @@ export default function RoomScreen({
       <ScrollView w='100%' p={5}>
         <Card>
           {/* Playlist info */}
-          <AspectRatio w="50%" bgColor='gray.300' ratio={1}>
+          <AspectRatio w="50%" bgColor={Colors.card} borderWidth={1} borderColor={Colors.border} ratio={1}>
             <Image
               src={currentSong?.thumbnailUrl}
               alt="Current song's thumbnail" />
           </AspectRatio>
 
           <HStack alignItems="center">
-            <Avatar marginRight={2} bg="green.500" size="xs" source={{
+            <Avatar marginRight={2} size="xs" source={{
               uri: route.params.room.owner.photoURL || undefined
             }}>
               {route.params.room.owner.displayName}
@@ -110,7 +107,6 @@ export default function RoomScreen({
               name: "add-circle-outline"
             }} />
           </HStack>
-
 
           {/* Playlist songs */}
           <VStack space={3} marginBottom={5} divider={<Divider />} w="100%">
