@@ -1,25 +1,32 @@
 import { AspectRatio, HStack, IconButton, Text, VStack, Image, View } from 'native-base';
-import { ActivityIndicator, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import Colors from '../constants/Colors';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 export default function AudioController(props: any) {
     if (!props.roomID) return null
     return (
         <HStack
             style={styles.container}
-            bgColor="gray.300"
+            bgColor="coolGray.900:alpha.90"
             w='100%'
             space={3}
             py={1.5}
             px={3}
         >
-            <AspectRatio bgColor='gray.500' h="100%" ratio={1}>
+            <AspectRatio bgColor={Colors.background} h="100%" ratio={1}>
+                {props.data ?
                 <Image src={props.data?.thumbnailUrl} alt="Song illustration" />
+                :
+                <View justifyContent='center' alignItems='center'>
+                    <MaterialCommunityIcons name="sleep" size={20} color="white" />
+                </View>}
             </AspectRatio>
 
-            <VStack justifyContent="center">
+            <VStack justifyContent="center" flexGrow={0} flexShrink={1}>
                 <Text fontSize={12} bold isTruncated>{props.data?.title || "Waiting for song..."}</Text>
-                <Text fontSize={12} isTruncated>{props.data?.author}</Text>
+                {props.data?.author && <Text fontSize={12} isTruncated>{props.data?.author}</Text>}
             </VStack>
 
             <IconButton onPress={() => props.stop()} marginLeft="auto" size='40px' variant='none' _icon={{
@@ -38,6 +45,6 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 5,
         borderTopLeftRadius: 5,
         paddingHorizontal: 5,
-        bottom: 50,
+        bottom: 60,
     },
 });

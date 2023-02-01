@@ -26,9 +26,7 @@ export default function GoogleAuthButton() {
     return (
         <Button
             w="100%"
-            variant="outline"
             isDisabled={isGoogleAuthed}
-            tintColor="grey"
             onPress={() => promptAsync()}
             leftIcon={<Icon as={Ionicons} name="logo-google" size="sm" />}>
             Sign in with Google

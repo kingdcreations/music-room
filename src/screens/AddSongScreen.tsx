@@ -1,14 +1,15 @@
-import { Keyboard, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { Keyboard, StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useContext, useState } from 'react';
-import { HStack, Icon, IconButton, Image, Input, ScrollView, Spinner, Text, View, VStack } from 'native-base';
+import { HStack, Icon, IconButton, Image, ScrollView, Spinner, Text, View, VStack } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FirebaseContext } from '../providers/FirebaseProvider';
 import { FIREBASE_API_KEY } from '@env';
 import { Track } from '../types/database';
 import { HomeStackScreenProps } from '../types';
+import Input from '../components/Input';
 
 export default function AddSongScreen({
-  route
+  route, navigation
 }: HomeStackScreenProps<'AddSong'>) {
   const [search, setSearch] = useState("")
   const [tracks, setTracks] = useState([])
@@ -25,6 +26,7 @@ export default function AddSongScreen({
       vote: 0
     }
     firebase.addSongToPlaylist(newtrack, route.params.room.id)
+    navigation.goBack()
   }
 
   const searchTracks = () => {
@@ -41,7 +43,8 @@ export default function AddSongScreen({
   return (
     <View style={styles.container}>
       <Input
-        m={5}
+        mx={5}
+        my={2}
         value={search}
         onChangeText={setSearch}
         InputRightElement={

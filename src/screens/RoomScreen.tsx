@@ -10,6 +10,7 @@ import { onValue, ref, query, orderByChild } from 'firebase/database';
 import { FirebaseContext } from '../providers/FirebaseProvider';
 import { AudioContext } from '../providers/AudioProvider';
 import Colors from '../constants/Colors';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 export default function RoomScreen({
   route, navigation
@@ -26,7 +27,7 @@ export default function RoomScreen({
   const play = async () => {
     const { currentSong, currentTime } = await fetch(`http://10.0.0.3:3000/room/${route.params.room.id}`)
       .then((res) => res.json())
-      
+
     if (currentSong) {
       await audio?.play(currentSong, currentTime, route.params.room.id)
       setCurrentSong(currentSong)
@@ -53,7 +54,7 @@ export default function RoomScreen({
     return onValue(queueRef, (childSnapshot) => {
       const queue = childSnapshot.val()
       setQueue(queue ? () => {
-        const tmpqueue:Track[] = []
+        const tmpqueue: Track[] = []
         childSnapshot.forEach((data) => {
           var song = data.val() as Track
           song.dbId = data.key ? data.key : undefined;
@@ -70,12 +71,16 @@ export default function RoomScreen({
         <Card>
           {/* Playlist info */}
           <AspectRatio w="50%" bgColor={Colors.card} borderWidth={1} borderColor={Colors.border} ratio={1}>
-            <Image
+            {currentSong ? <Image
               src={currentSong?.thumbnailUrl}
               alt="Current song's thumbnail" />
+              :
+              <View justifyContent='center' alignItems='center'>
+                <MaterialCommunityIcons name="sleep" size={50} color="white" />
+              </View>}
           </AspectRatio>
 
-          <HStack alignItems="center">
+          <HStack mb={3} alignItems="center">
             <Avatar marginRight={2} size="xs" source={{
               uri: route.params.room.owner.photoURL || undefined
             }}>

@@ -27,7 +27,9 @@ export default function HomeStack() {
       <HomeStack.Screen
         name="AddSong"
         component={AddSongScreen}
-        options={({ route }) => ({ title: route.params.room.name })}
+        options={{
+          title: 'Add song to playlist',
+        }}
       />
       <HomeStack.Screen
         name="AddRoom"

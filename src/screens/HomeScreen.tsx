@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { FirebaseContext } from '../providers/FirebaseProvider';
-import { Button, ScrollView, Stack, View, Text } from 'native-base';
+import { Button, ScrollView, Stack, View, Text, Heading, Divider } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
 import { equalTo, onValue, orderByChild, query, ref } from 'firebase/database';
@@ -37,20 +37,21 @@ export default function HomeScreen({
 
   return (
     <View style={styles.container}>
-      <ScrollView w='100%' p={5} contentContainerStyle={styles.scrollContainer}>
-        <Card>
-          <Text>My rooms</Text>
+      <ScrollView w='100%'>
+        <Card p={5}>
+          <Heading size="md">My rooms</Heading>
           <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
             {rooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
           </Stack>
           <Button w="100%" onPress={() => navigation.navigate('AddRoom')}>New room</Button>
-        </Card>
 
-        <Card>
-          <Text>Joined rooms</Text>
-          <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
-            {joinedRooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
-          </Stack>
+          {joinedRooms.length !== 0 && <>
+              <Divider my={5} />
+              <Heading size="md">Joined rooms</Heading>
+              <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
+                {joinedRooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
+              </Stack>
+            </>}
         </Card>
       </ScrollView>
     </View>
@@ -60,10 +61,6 @@ export default function HomeScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scrollContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },
