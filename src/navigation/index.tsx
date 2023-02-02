@@ -34,11 +34,11 @@ export default function Navigation() {
                 <RootStack.Navigator
                     initialRouteName="HomeRoot"
                     screenOptions={({ route }) => ({
-                        tabBarStyle:{
-                          height: 60,
+                        tabBarStyle: {
+                            height: 60,
                         },
-                        tabBarItemStyle:{
-                          margin: 7.5,
+                        tabBarItemStyle: {
+                            margin: 7.5,
                         },
                         tabBarIcon: ({ color, size }) => {
                             if (route.name === 'HomeRoot') {

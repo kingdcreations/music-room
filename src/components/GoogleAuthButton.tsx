@@ -7,7 +7,6 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { FIREBASE_CLIENT_ID } from '@env';
 import { doc, setDoc } from 'firebase/firestore';
 
-
 export default function GoogleAuthButton() {
     const firebase = useContext(FirebaseContext)
 
@@ -27,7 +26,7 @@ export default function GoogleAuthButton() {
                     email: firebase.auth.currentUser?.email,
                     displayName: firebase.auth.currentUser?.displayName,
                     photoURL: firebase.auth.currentUser?.photoURL,
-                }, { merge:true }))
+                }, { merge: true }))
         }
     }, [response]);
 

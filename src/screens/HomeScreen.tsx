@@ -4,7 +4,7 @@ import { FirebaseContext } from '../providers/FirebaseProvider';
 import { Button, ScrollView, Stack, View, Heading, Divider } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
-import { equalTo, get, onValue, orderByChild, orderByKey, query, ref } from 'firebase/database';
+import { equalTo, get, onValue, orderByChild, query, ref } from 'firebase/database';
 import { Join, Room } from '../types/database';
 import PlaylistButton from '../components/PlaylistButton';
 

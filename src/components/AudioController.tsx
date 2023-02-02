@@ -17,11 +17,11 @@ export default function AudioController(props: any) {
         >
             <AspectRatio bgColor={Colors.background} h="100%" ratio={1}>
                 {props.data ?
-                <Image src={props.data?.thumbnailUrl} alt="Song illustration" />
-                :
-                <View justifyContent='center' alignItems='center'>
-                    <MaterialCommunityIcons name="sleep" size={20} color="white" />
-                </View>}
+                    <Image src={props.data?.thumbnailUrl} alt="Song illustration" />
+                    :
+                    <View justifyContent='center' alignItems='center'>
+                        <MaterialCommunityIcons name="sleep" size={20} color="white" />
+                    </View>}
             </AspectRatio>
 
             <VStack justifyContent="center" flexGrow={0} flexShrink={1}>

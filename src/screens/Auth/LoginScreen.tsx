@@ -25,7 +25,7 @@ export default function LoginScreen({
       .then(() => {
         setDoc(doc(firebase.firestore, 'users/' + firebase.auth.currentUser?.uid), {
           email: firebase.auth.currentUser?.email,
-        }, { merge:true })
+        }, { merge: true })
       })
       .catch(e => toast.show({ description: e.code }))
   };
