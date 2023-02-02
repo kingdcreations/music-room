@@ -18,11 +18,12 @@ export default function AddSongScreen({
   const firebase = useContext(FirebaseContext)
 
   const addToPlaylist = (track: any) => {
-    var newtrack: Track = {
-      id: track.id.videoId,
+    const newtrack: Track = {
+      songId: track.id.videoId,
       title: track.snippet.title,
       author: track.snippet.channelTitle,
       thumbnailUrl: track.snippet.thumbnails.default.url,
+      votes: [],
       vote: 0
     }
     firebase.addSongToPlaylist(newtrack, route.params.room.id)
@@ -58,7 +59,7 @@ export default function AddSongScreen({
         placeholder="What are we listening to ?" />
       <ScrollView w="100%">
         <VStack w="100%" alignItems='center' px={5} mb={5} space='4'>
-          {!isLoading ? tracks.map((track: any, i) => (
+          {!isLoading && tracks ? tracks.map((track: any, i) => (
             <TouchableOpacity key={i} onPress={() => addToPlaylist(track)}>
               <HStack w="100%" space="4" alignItems='center'>
                 <Image

@@ -6,7 +6,7 @@ import { HomeStackScreenProps } from '../types';
 import SongItem from '../components/SongItem';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Track } from '../types/database';
-import { onValue, ref, query, orderByChild } from 'firebase/database';
+import { onValue, ref, query, orderByChild, child, onChildChanged, DataSnapshot } from 'firebase/database';
 import { FirebaseContext } from '../providers/FirebaseProvider';
 import { AudioContext } from '../providers/AudioProvider';
 import Colors from '../constants/Colors';
@@ -57,7 +57,6 @@ export default function RoomScreen({
         const tmpqueue: Track[] = []
         childSnapshot.forEach((data) => {
           var song = data.val() as Track
-          song.dbId = data.key ? data.key : undefined;
           tmpqueue.unshift(song)
         })
         return tmpqueue
@@ -115,7 +114,7 @@ export default function RoomScreen({
 
           {/* Playlist songs */}
           <VStack space={3} marginBottom={5} divider={<Divider />} w="100%">
-            {currentSong && <SongItem song={currentSong} playing roomId={route.params.room.id} />}
+            {currentSong && <SongItem song={currentSong} playing roomId={route.params.room.id}/>}
             {queue.map((song, id) => <SongItem song={song} key={id} roomId={route.params.room.id} />)}
           </VStack>
           <Button onPress={addSong}>Add a song</Button>
