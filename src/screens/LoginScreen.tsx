@@ -1,15 +1,13 @@
 import { StyleSheet } from 'react-native';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { RootStackScreenProps } from '../types';
 import { FirebaseContext } from '../providers/FirebaseProvider';
-import { GoogleAuthProvider, signInWithCredential, signInWithEmailAndPassword } from "firebase/auth";
-import * as Google from 'expo-auth-session/providers/google';
-import { Button, FormControl, Text, Divider, Icon, ScrollView } from 'native-base';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { Button, FormControl, Text, Divider, ScrollView } from 'native-base';
 import { useToast } from 'native-base';
-import { FIREBASE_CLIENT_ID } from '@env';
 import Card from '../components/Card';
 import Input from '../components/Input';
+import GoogleAuthButton from '../components/GoogleAuthButton';
 
 export default function LoginScreen({
   navigation
@@ -20,18 +18,6 @@ export default function LoginScreen({
 
   const toast = useToast();
   const firebase = useContext(FirebaseContext)
-
-  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    clientId: FIREBASE_CLIENT_ID,
-    // iosClientId: FIREBASE_CLIENT_ID
-  });
-
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const credential = GoogleAuthProvider.credential(response.params.id_token);
-      signInWithCredential(firebase.auth, credential);
-    }
-  }, [response]);
 
   const login = () => {
     signInWithEmailAndPassword(firebase.auth, mail, pass)
@@ -55,13 +41,7 @@ export default function LoginScreen({
 
         <Divider />
 
-        <Button
-          w="100%"
-          variant="outline"
-          onPress={() => promptAsync()}
-          leftIcon={<Icon as={Ionicons} name="logo-google" size="sm" />}>
-          Sign in with Google
-        </Button>
+        <GoogleAuthButton />
         <Button variant="link" onPress={recover}>Forgotten password</Button>
       </Card>
 

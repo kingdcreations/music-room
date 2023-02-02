@@ -17,6 +17,8 @@ export default function GoogleAuthButton() {
         // iosClientId: FIREBASE_CLIENT_ID
     });
 
+    const login = async () => await promptAsync()
+
     useEffect(() => {
         if (response?.type === 'success') {
             const credential = GoogleAuthProvider.credential(response.params.id_token);
@@ -36,7 +38,7 @@ export default function GoogleAuthButton() {
         <Button
             w="100%"
             isDisabled={isGoogleAuthed}
-            onPress={() => promptAsync()}
+            onPress={login}
             leftIcon={<Icon as={Ionicons} name="logo-google" size="sm" />}>
             Sign in with Google
         </Button>
