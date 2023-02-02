@@ -7,14 +7,12 @@ import fs from "fs";
 
 export default class Room {
     data: DataSnapshot
-    songs: Map<string, Track>
 
     currentSong: Track | null
     songStartedAt: number
 
     constructor(data: DataSnapshot) {
         this.data = data
-        this.songs = new Map()
 
         this.currentSong = null
         this.songStartedAt = -1
@@ -24,17 +22,11 @@ export default class Room {
         const ref = admin.database().ref(`/playlists/${data.key}/queue`)
         ref.on('child_added', (dataSnapshot) => {
             if (dataSnapshot.exists() && dataSnapshot.key) {
-                this.songs.set(dataSnapshot.key, dataSnapshot.val())
                 this.downloadSong(dataSnapshot.val())
                     .then(() => this.loadNextSong())
             }
         })
 
-        ref.on('child_removed', (dataSnapshot) => {
-            if (dataSnapshot.exists() && dataSnapshot.key) {
-                this.songs.delete(dataSnapshot.key)
-            }
-        })
     }
 
     async loadCurrentSong() {
@@ -56,12 +48,23 @@ export default class Room {
     async loadNextSong() {
         const currentSongRef = admin.database().ref(`/playlists/${this.data.key}/currentSong`)
         const currentSong = (await currentSongRef.get()).val()
+        
+        const queueSongRef = admin.database().ref(`/playlists/${this.data.key}/queue`)
+        var nextSong: Array<string|Track> = []
 
+        // Find the most voted song in the DB
+        await queueSongRef.orderByChild('vote').limitToLast(1).get()
+        .then((snapshot) => {
+            const data = snapshot.val();
+            if (snapshot.exists()) {
+                nextSong = [Object.entries<Track>(data)[0][0], Object.entries<Track>(data)[0][1]]
+            }
+        })
+        
         // If there is no current song and a next song is available
-        const nextSong = this.songs.entries().next().value;
-        if (!currentSong && nextSong) {
-            const nextSongKey = nextSong[0]
-            const nextSongData = nextSong[1]
+        if (!currentSong && nextSong.length === 2) {
+            const nextSongKey = nextSong[0] as string
+            const nextSongData = nextSong[1] as Track
 
             // Remove the next song from the queue
             await admin.database()
