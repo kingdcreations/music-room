@@ -2,11 +2,11 @@ import { Keyboard, StyleSheet, TouchableOpacity } from 'react-native';
 import React, { useContext, useState } from 'react';
 import { HStack, Icon, IconButton, Image, ScrollView, Spinner, Text, View, VStack } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { FirebaseContext } from '../providers/FirebaseProvider';
+import { FirebaseContext } from '../../providers/FirebaseProvider';
 import { FIREBASE_API_KEY } from '@env';
-import { Track } from '../types/database';
-import { HomeStackScreenProps } from '../types';
-import Input from '../components/Input';
+import { Track } from '../../types/database';
+import { HomeStackScreenProps } from '../../types';
+import Input from '../../components/Input';
 
 export default function AddSongScreen({
   route, navigation

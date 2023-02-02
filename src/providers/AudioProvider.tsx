@@ -4,16 +4,14 @@ import AudioController from '../components/AudioController';
 import { Audio } from 'expo-av';
 import { MUSIC_ROOM_API } from '@env'
 
-export const AudioContext = createContext<
-    {
-        data: Track | null;
-        setData: React.Dispatch<React.SetStateAction<Track | null>>;
-        sound: Audio.Sound | undefined;
-        play: (currentSong: Track, currentTime: number, roomID: string) => Promise<void>;
-        stop: () => Promise<void>;
-        roomID: string | null;
-    } | undefined
->(undefined)
+export const AudioContext = createContext<{
+    data: Track | null;
+    setData: React.Dispatch<React.SetStateAction<Track | null>>;
+    sound: Audio.Sound | undefined;
+    play: (currentSong: Track, currentTime: number, roomID: string) => Promise<void>;
+    stop: () => Promise<void>;
+    roomID: string | null;
+} | undefined>(undefined)
 
 export default function AudioProvider({ children }: { children: React.ReactNode }) {
     const [sound, setSound] = useState<Audio.Sound>();

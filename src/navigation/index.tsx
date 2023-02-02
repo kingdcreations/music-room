@@ -4,9 +4,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { RootStackParamList } from '../types';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { FirebaseContext } from '../providers/FirebaseProvider';
-import LoginScreen from '../screens/LoginScreen'
-import SigninScreen from '../screens/SigninScreen'
-import RecoverScreen from '../screens/RecoverScreen';
+import LoginScreen from '../screens/Auth/LoginScreen'
+import SigninScreen from '../screens/Auth/SigninScreen'
+import RecoverScreen from '../screens/Auth/RecoverScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import SearchScreen from '../screens/SearchScreen';

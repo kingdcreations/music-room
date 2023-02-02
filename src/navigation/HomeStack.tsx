@@ -1,11 +1,12 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
-import AddRoomScreen from '../screens/AddRoomScreen';
+import AddRoomScreen from '../screens/Room/AddRoomScreen';
 import { HomeStackParamList } from '../types';
-import RoomScreen from '../screens/RoomScreen';
-import AddSongScreen from '../screens/AddSongScreen';
-import AddUserScreen from '../screens/AddUserScreen';
+import RoomScreen from '../screens/Room/RoomScreen';
+import AddSongScreen from '../screens/Room/AddSongScreen';
+import AddUserScreen from '../screens/Room/AddUserScreen';
+import UsersScreen from '../screens/Room/UsersScreen';
 
 export default function HomeStack() {
   const HomeStack = createNativeStackNavigator<HomeStackParamList>();
@@ -24,6 +25,10 @@ export default function HomeStack() {
         name="Room"
         component={RoomScreen}
         options={({ route }) => ({ title: route.params.room.name })}
+      />
+      <HomeStack.Screen
+        name="Users"
+        component={UsersScreen}
       />
       <HomeStack.Screen
         name="AddSong"

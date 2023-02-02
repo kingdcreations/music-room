@@ -57,7 +57,10 @@ export default class Firebase {
     }
 
     addUserToRoom = async (user: User, roomID: string) => {
-        const playlistRef = ref(this.database, 'users/' + user.uid + '/rooms/' + roomID);
-        set(playlistRef, true)
+        const playlistRef = ref(this.database, 'joins');
+        push(playlistRef, {
+            user,
+            roomID
+        })
     }
 }

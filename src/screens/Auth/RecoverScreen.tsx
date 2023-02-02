@@ -1,11 +1,11 @@
 import { StyleSheet } from 'react-native';
 import { useContext, useState } from 'react';
-import { FirebaseContext } from '../providers/FirebaseProvider';
+import { FirebaseContext } from '../../providers/FirebaseProvider';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { RootStackScreenProps } from '../types';
+import { RootStackScreenProps } from '../../types';
 import { Button, FormControl, ScrollView, useToast } from 'native-base';
-import Card from '../components/Card';
-import Input from '../components/Input';
+import Card from '../../components/Card';
+import Input from '../../components/Input';
 
 export default function Recover({
   navigation

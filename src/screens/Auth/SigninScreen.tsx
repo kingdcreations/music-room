@@ -1,18 +1,16 @@
 import { StyleSheet } from 'react-native';
 import { useContext, useState } from 'react';
-import { RootStackScreenProps } from '../types';
-import { FirebaseContext } from '../providers/FirebaseProvider';
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { Button, FormControl, Text, Divider, ScrollView } from 'native-base';
-import { useToast } from 'native-base';
-import Card from '../components/Card';
-import Input from '../components/Input';
-import GoogleAuthButton from '../components/GoogleAuthButton';
+import { FirebaseContext } from '../../providers/FirebaseProvider';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { RootStackScreenProps } from '../../types';
+import { Button, FormControl, ScrollView, useToast } from 'native-base';
+import Card from '../../components/Card';
 import { doc, setDoc } from 'firebase/firestore';
+import Input from '../../components/Input';
 
-export default function LoginScreen({
+export default function SigninScreen({
   navigation
-}: RootStackScreenProps<'Login'>) {
+}: RootStackScreenProps<'Signin'>) {
 
   const [mail, setMail] = useState("")
   const [pass, setPass] = useState("")
@@ -20,18 +18,15 @@ export default function LoginScreen({
   const toast = useToast();
   const firebase = useContext(FirebaseContext)
 
-  const login = () => {
-    signInWithEmailAndPassword(firebase.auth, mail, pass)
+  const signin = () => {
+    createUserWithEmailAndPassword(firebase.auth, mail, pass)
       .then(() => {
         setDoc(doc(firebase.firestore, 'users/' + firebase.auth.currentUser?.uid), {
           email: firebase.auth.currentUser?.email,
         }, { merge:true })
       })
       .catch(e => toast.show({ description: e.code }))
-  };
-
-  const signin = () => navigation.navigate('Signin')
-  const recover = () => navigation.navigate('Recover')
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container} mx={5}>
@@ -43,17 +38,8 @@ export default function LoginScreen({
           <FormControl.Label>Password</FormControl.Label>
           <Input onChangeText={setPass} value={pass} type="password" placeholder="Password" />
         </FormControl>
-        <Button w="100%" onPress={login}>Login</Button>
-
-        <Divider />
-
-        <GoogleAuthButton />
-        <Button variant="link" onPress={recover}>Forgotten password</Button>
-      </Card>
-
-      <Card>
-        <Text>No account yet?</Text>
         <Button w="100%" onPress={signin}>Sign in</Button>
+        <Button w="100%" colorScheme='gray' onPress={() => navigation.goBack()}>Cancel</Button>
       </Card>
     </ScrollView>
   );

@@ -5,7 +5,7 @@ import { Button, ScrollView, Stack, View, Heading, Divider } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
 import { equalTo, get, onValue, orderByChild, orderByKey, query, ref } from 'firebase/database';
-import { Room } from '../types/database';
+import { Join, Room } from '../types/database';
 import PlaylistButton from '../components/PlaylistButton';
 
 export default function HomeScreen({
@@ -22,10 +22,9 @@ export default function HomeScreen({
 
     const q = query(ref(firebase.database, 'rooms'), orderByChild('owner/uid'), equalTo(uid))
     return onValue(q, (snapshot) => {
-      const data = snapshot.val();
-
       setRooms([])
       if (snapshot.exists()) {
+        const data = snapshot.val();
         Object.values(data).map((room, i) => setRooms((rooms) => {
           const newRoom = room as Room;
           newRoom.id = Object.keys(data)[i]
@@ -38,15 +37,18 @@ export default function HomeScreen({
   useEffect(() => {
     if (!uid) return
 
-    return onValue(ref(firebase.database, 'users/' + uid), (snapshot) => {
+    const q = query(
+      ref(firebase.database, 'joins'),
+      orderByChild('user/uid'),
+      equalTo(uid))
+    return onValue(q, (snapshot) => {
+      setJoinedRooms([])
       if (snapshot.exists()) {
-        const joinedRoomsID = Object.keys(snapshot.val().rooms);
-
-        const promises = joinedRoomsID.map(async (joinedRoomID) => {
-          const room = await get(ref(firebase.database, 'rooms/' + joinedRoomID))
+        const joins = Object.values(snapshot.val()) as Join[]
+        const promises = joins.map(async (join) => {
+          const room = await get(ref(firebase.database, 'rooms/' + join.roomID))
           return { id: room.key, ...room.val() }
         });
-
         Promise.all(promises).then(data => setJoinedRooms(data))
       }
     });

@@ -5,7 +5,7 @@
 
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Room } from './database';
+import { Room, User } from './database';
 
 export type RootStackParamList = {
     HomeRoot: NavigatorScreenParams<HomeStackParamList> | undefined;
@@ -22,8 +22,9 @@ export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
 export type HomeStackParamList = {
     Home: undefined;
     Room: { room: Room };
+    Users: { room: Room };
     AddSong: { room: Room };
-    AddUser: { room: Room };
+    AddUser: { users: User[], room: Room };
     AddRoom: undefined;
 };
 

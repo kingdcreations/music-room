@@ -12,9 +12,13 @@ export type Track = {
 export type User = {
     uid: string,
     mail: string,
-    verified: string,
     photoURL?: string,
     displayName?: string,
+}
+
+export type Join = {
+    roomID: string,
+    user: User,
 }
 
 export type Room = {

@@ -1,14 +1,14 @@
 import { StyleSheet } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { AspectRatio, Avatar, Button, Divider, VStack, HStack, IconButton, ScrollView, Text, View, Image } from 'native-base';
-import Card from '../components/Card';
-import { HomeStackScreenProps } from '../types';
-import SongItem from '../components/SongItem';
-import { Track } from '../types/database';
+import Card from '../../components/Card';
+import { HomeStackScreenProps } from '../../types';
+import SongItem from '../../components/SongItem';
+import { Track } from '../../types/database';
 import { onValue, ref, query, orderByChild, child, onChildChanged, DataSnapshot } from 'firebase/database';
-import { FirebaseContext } from '../providers/FirebaseProvider';
-import { AudioContext } from '../providers/AudioProvider';
-import Colors from '../constants/Colors';
+import { FirebaseContext } from '../../providers/FirebaseProvider';
+import { AudioContext } from '../../providers/AudioProvider';
+import Colors from '../../constants/Colors';
 import { MaterialIcons, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { MUSIC_ROOM_API } from '@env'
 
@@ -25,7 +25,7 @@ export default function RoomScreen({
   }
 
   const addUser = () => {
-    navigation.navigate('AddUser', { room: route.params.room })
+    navigation.navigate('Users', { room: route.params.room })
   }
 
   const play = async () => {
