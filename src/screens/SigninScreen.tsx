@@ -21,8 +21,7 @@ export default function SigninScreen({
   const signin = () => {
     createUserWithEmailAndPassword(firebase.auth, mail, pass)
       .then(() => {
-        addDoc(collection(firebase.firestore, 'users'), {
-          uid: firebase.auth.currentUser?.uid,
+        addDoc(collection(firebase.firestore, 'users/' + firebase.auth.currentUser?.uid), {
           mail: firebase.auth.currentUser?.email,
           verified: firebase.auth.currentUser?.emailVerified,
         })
