@@ -3,8 +3,9 @@ import { useContext, useState } from 'react';
 import { FirebaseContext } from '../providers/FirebaseProvider';
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { RootStackScreenProps } from '../types';
-import { Button, FormControl, Input, ScrollView, useToast } from 'native-base';
+import { Button, FormControl, ScrollView, useToast } from 'native-base';
 import Card from '../components/Card';
+import Input from '../components/Input';
 
 export default function Recover({
   navigation

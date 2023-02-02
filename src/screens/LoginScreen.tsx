@@ -4,11 +4,12 @@ import { RootStackScreenProps } from '../types';
 import { FirebaseContext } from '../providers/FirebaseProvider';
 import { GoogleAuthProvider, signInWithCredential, signInWithEmailAndPassword } from "firebase/auth";
 import * as Google from 'expo-auth-session/providers/google';
-import { Input, Button, FormControl, Text, Divider, Icon, ScrollView } from 'native-base';
+import { Button, FormControl, Text, Divider, Icon, ScrollView } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useToast } from 'native-base';
 import { FIREBASE_CLIENT_ID } from '@env';
 import Card from '../components/Card';
+import Input from '../components/Input';
 
 export default function LoginScreen({
   navigation

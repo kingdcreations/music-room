@@ -26,6 +26,7 @@ export default function AudioProvider({ children }: { children: React.ReactNode 
     }
 
     const play = async (currentSong: Track, currentTime: number, roomID: string) => {
+        await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
         try {
             if (sound) {
                 await sound.unloadAsync();

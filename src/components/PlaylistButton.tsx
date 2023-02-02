@@ -27,6 +27,9 @@ export default function PlaylistButton({ room }: { room: Room }) {
     return (
         <View p={2} w={{ base: '50%', md: '25%' }}>
             <TouchableOpacity onPress={openRoom}>
+                {room.private && <View top={3} right={3} position={'absolute'} zIndex={5}>
+                    <MaterialCommunityIcons name="lock" size={25} color="grey" />
+                </View>}
                 <AspectRatio
                     w="100%"
                     borderWidth={1}

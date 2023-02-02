@@ -7,6 +7,14 @@ export type Track = {
     vote: number
 }
 
+export type User = {
+    uid: string,
+    mail: string,
+    verified: string,
+    photoURL?: string,
+    displayName?: string,
+}
+
 export type Room = {
     id: string;
     name: string;

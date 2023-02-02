@@ -4,13 +4,12 @@ import { AspectRatio, Avatar, Button, Divider, VStack, HStack, IconButton, Scrol
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
 import SongItem from '../components/SongItem';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { Track } from '../types/database';
 import { onValue, ref, query, orderByChild } from 'firebase/database';
 import { FirebaseContext } from '../providers/FirebaseProvider';
 import { AudioContext } from '../providers/AudioProvider';
 import Colors from '../constants/Colors';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { MaterialIcons, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 
 export default function RoomScreen({
   route, navigation
@@ -22,6 +21,10 @@ export default function RoomScreen({
 
   const addSong = () => {
     navigation.navigate('AddSong', { room: route.params.room })
+  }
+
+  const addUser = () => {
+    navigation.navigate('AddUser', { room: route.params.room })
   }
 
   const play = async () => {
@@ -65,6 +68,8 @@ export default function RoomScreen({
     });
   }, [])
 
+  const isAdmin = () => route.params.room.owner.uid === firebase.auth.currentUser?.uid
+
   return (
     <View style={styles.container}>
       <ScrollView w='100%' p={5}>
@@ -90,27 +95,42 @@ export default function RoomScreen({
           </HStack>
 
           {/* Controls */}
-          <HStack alignItems="center">
-            <IconButton variant="link" _icon={{
-              as: Ionicons,
-              size: '5',
-              name: "person-add-outline"
-            }} />
+          <Divider/>
+
+          <HStack w='100%' alignItems="center" justifyContent="space-between">
+            <HStack alignItems="center">
+              <IconButton mr={2} onPress={addSong} variant="outline" _icon={{
+                as: MaterialCommunityIcons,
+                size: '5',
+                name: "music-note-plus"
+              }} />
+              {isAdmin() && route.params.room.private && <IconButton onPress={addUser} variant="link" _icon={{
+                as: MaterialIcons,
+                size: '5',
+                name: "person-add-alt-1"
+              }} />}
+              {isAdmin() && route.params.room.private && <IconButton variant="link" _icon={{
+                as: MaterialCommunityIcons,
+                size: '5',
+                name: "trash-can"
+              }} />}
+              <IconButton variant="link" _icon={{
+                as: MaterialCommunityIcons,
+                size: '5',
+                name: "share-variant"
+              }} />
+            </HStack>
+
             {audio?.roomID === route.params.room.id ?
               <IconButton onPress={stop} size='40px' variant="solid" _icon={{
                 as: Ionicons,
                 name: "stop-outline"
               }} />
               :
-              <IconButton onPress={play} size='40px' variant="solid" _icon={{
+              <IconButton isDisabled={currentSong === null} onPress={play} size='40px' variant="solid" _icon={{
                 as: Ionicons,
                 name: "play-outline"
               }} />}
-            <IconButton onPress={addSong} variant="link" _icon={{
-              as: Ionicons,
-              size: '5',
-              name: "add-circle-outline"
-            }} />
           </HStack>
 
           {/* Playlist songs */}
@@ -118,7 +138,7 @@ export default function RoomScreen({
             {currentSong && <SongItem song={currentSong} playing roomId={route.params.room.id} />}
             {queue.map((song, id) => <SongItem song={song} key={id} roomId={route.params.room.id} />)}
           </VStack>
-          <Button onPress={addSong}>Add a song</Button>
+          {queue.length !== 0 && <Button onPress={addSong}>Add a song</Button>}
         </Card>
       </ScrollView>
     </View>

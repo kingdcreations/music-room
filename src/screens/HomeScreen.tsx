@@ -1,10 +1,10 @@
 import { StyleSheet } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
 import { FirebaseContext } from '../providers/FirebaseProvider';
-import { Button, ScrollView, Stack, View, Text, Heading, Divider } from 'native-base';
+import { Button, ScrollView, Stack, View, Heading, Divider } from 'native-base';
 import Card from '../components/Card';
 import { HomeStackScreenProps } from '../types';
-import { equalTo, onValue, orderByChild, query, ref } from 'firebase/database';
+import { equalTo, get, onValue, orderByChild, orderByKey, query, ref } from 'firebase/database';
 import { Room } from '../types/database';
 import PlaylistButton from '../components/PlaylistButton';
 
@@ -35,23 +35,41 @@ export default function HomeScreen({
     });
   }, [])
 
+  useEffect(() => {
+    if (!uid) return
+
+    return onValue(ref(firebase.database, 'users/' + uid), (snapshot) => {
+      if (snapshot.exists()) {
+        const joinedRoomsID = Object.keys(snapshot.val().rooms);
+
+        const promises = joinedRoomsID.map(async (joinedRoomID) => {
+          const room = await get(ref(firebase.database, 'rooms/' + joinedRoomID))
+          return { id: room.key, ...room.val() }
+        });
+
+        Promise.all(promises).then(data => setJoinedRooms(data))
+      }
+    });
+  }, [])
+
   return (
     <View style={styles.container}>
       <ScrollView w='100%'>
         <Card p={5}>
+          <Button w="100%" onPress={() => navigation.navigate('AddRoom')}>New room</Button>
+          <Divider my={2} />
           <Heading size="md">My rooms</Heading>
           <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
             {rooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
           </Stack>
-          <Button w="100%" onPress={() => navigation.navigate('AddRoom')}>New room</Button>
 
           {joinedRooms.length !== 0 && <>
-              <Divider my={5} />
-              <Heading size="md">Joined rooms</Heading>
-              <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
-                {joinedRooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
-              </Stack>
-            </>}
+            <Divider my={2} />
+            <Heading size="md">Joined rooms</Heading>
+            <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
+              {joinedRooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
+            </Stack>
+          </>}
         </Card>
       </ScrollView>
     </View>

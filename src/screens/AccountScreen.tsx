@@ -5,8 +5,8 @@ import { FirebaseContext } from '../providers/FirebaseProvider';
 import { Avatar, Button, Divider, ScrollView, useToast, Text, View } from "native-base";
 import Card from '../components/Card';
 import GoogleAuthButton from '../components/GoogleAuthButton';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import Input from '../components/Input';
+import Colors from '../constants/Colors';
 
 export default function AccountScreen() {
   const [curPass, setCurPass] = useState("")

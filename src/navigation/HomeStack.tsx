@@ -5,6 +5,7 @@ import AddRoomScreen from '../screens/AddRoomScreen';
 import { HomeStackParamList } from '../types';
 import RoomScreen from '../screens/RoomScreen';
 import AddSongScreen from '../screens/AddSongScreen';
+import AddUserScreen from '../screens/AddUserScreen';
 
 export default function HomeStack() {
   const HomeStack = createNativeStackNavigator<HomeStackParamList>();
@@ -36,6 +37,13 @@ export default function HomeStack() {
         component={AddRoomScreen}
         options={{
           title: 'New Room',
+        }}
+      />
+      <HomeStack.Screen
+        name="AddUser"
+        component={AddUserScreen}
+        options={{
+          title: 'Add user',
         }}
       />
     </HomeStack.Navigator>

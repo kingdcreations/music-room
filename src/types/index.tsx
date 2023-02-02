@@ -23,6 +23,7 @@ export type HomeStackParamList = {
     Home: undefined;
     Room: { room: Room };
     AddSong: { room: Room };
+    AddUser: { room: Room };
     AddRoom: undefined;
 };
 

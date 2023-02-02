@@ -5,6 +5,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import { Button, Icon } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FIREBASE_CLIENT_ID } from '@env';
+import { addDoc, collection } from 'firebase/firestore';
 
 
 export default function GoogleAuthButton() {
@@ -19,7 +20,15 @@ export default function GoogleAuthButton() {
     useEffect(() => {
         if (response?.type === 'success') {
             const credential = GoogleAuthProvider.credential(response.params.id_token);
-            signInWithCredential(firebase.auth, credential);
+            signInWithCredential(firebase.auth, credential).then(() => {
+                addDoc(collection(firebase.firestore, 'users'), {
+                    uid: firebase.auth.currentUser?.uid,
+                    mail: firebase.auth.currentUser?.email,
+                    verified: firebase.auth.currentUser?.emailVerified,
+                    displayName: firebase.auth.currentUser?.displayName,
+                    photoURL: firebase.auth.currentUser?.photoURL,
+                })
+            })
         }
     }, [response]);
 

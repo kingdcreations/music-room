@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { Auth, initializeAuth, signInWithEmailAndPassword, updatePassword } from "firebase/auth";
 import { Firestore, getFirestore } from "firebase/firestore";
-import { Database, getDatabase, push, ref } from "firebase/database";
+import { Database, getDatabase, push, ref, set } from "firebase/database";
 import { getReactNativePersistence } from 'firebase/auth/react-native';
 
 import {
@@ -12,7 +12,7 @@ import {
     FIREBASE_APP_ID
 } from "@env"
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Track } from "../types/database";
+import { Track, User } from "../types/database";
 
 export default class Firebase {
     auth: Auth
@@ -51,5 +51,10 @@ export default class Firebase {
     addSongToPlaylist = async (song: Track, roomID: string) => {
         const playlistRef = ref(this.database, 'playlists/' + roomID + '/queue');
         push(playlistRef, song)
+    }
+
+    addUserToRoom = async (user: User, roomID: string) => {
+        const playlistRef = ref(this.database, 'users/' + user.uid + '/rooms/' + roomID);
+        set(playlistRef, true)
     }
 }

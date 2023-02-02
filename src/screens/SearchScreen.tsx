@@ -33,7 +33,7 @@ export default function SearchScreen() {
 
   return (
     <View style={styles.container}>
-      <Input
+      {/* <Input
         mx={5}
         my={2}
         value={search}
@@ -41,10 +41,10 @@ export default function SearchScreen() {
         InputLeftElement={
           <Icon as={<Ionicons name="search" />} size={5} ml="2" color="muted.400" />
         }
-        placeholder="Looking for a particular room ?" />
+        placeholder="Looking for a particular room ?" /> */}
       <ScrollView w="100%">
         <Card px={5}>
-          <Heading mt={2} size="md">Public rooms</Heading>
+          {/* <Heading mt={2} size="md">Public rooms</Heading> */}
           <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
             {rooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
           </Stack>
