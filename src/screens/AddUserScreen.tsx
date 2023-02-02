@@ -27,7 +27,7 @@ export default function AddUserScreen({
     Keyboard.dismiss()
     setIsLoading(true)
 
-    const q = query(collection(firebase.firestore, 'users'), where('mail', '==', search))
+    const q = query(collection(firebase.firestore, 'users'), where('email', '==', search))
     getDocs(q)
       .then(dataSnapshot => {
         setUsers(dataSnapshot.docs.map((doc) => ({uid: doc.id, ...doc.data()}) as User))

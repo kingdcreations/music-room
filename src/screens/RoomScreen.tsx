@@ -10,6 +10,7 @@ import { FirebaseContext } from '../providers/FirebaseProvider';
 import { AudioContext } from '../providers/AudioProvider';
 import Colors from '../constants/Colors';
 import { MaterialIcons, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { MUSIC_ROOM_API } from '@env'
 
 export default function RoomScreen({
   route, navigation
@@ -28,7 +29,7 @@ export default function RoomScreen({
   }
 
   const play = async () => {
-    const { currentSong, currentTime } = await fetch(`http://10.0.0.3:3000/room/${route.params.room.id}`)
+    const { currentSong, currentTime } = await fetch(`http://${MUSIC_ROOM_API}:3000/room/${route.params.room.id}`)
       .then((res) => res.json())
 
     if (currentSong) {

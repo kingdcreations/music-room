@@ -3,8 +3,6 @@ import http from 'http'
 
 import fs from 'fs'
 import path from 'path'
-import ytdl from 'ytdl-core'
-
 import admin from "firebase-admin"
 
 import Room from './classes/Room'

@@ -57,11 +57,13 @@ export default function HomeScreen({
       <ScrollView w='100%'>
         <Card p={5}>
           <Button w="100%" onPress={() => navigation.navigate('AddRoom')}>New room</Button>
-          <Divider my={2} />
-          <Heading size="md">My rooms</Heading>
-          <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
-            {rooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
-          </Stack>
+          {rooms.length !== 0 && <>
+            <Divider my={2} />
+            <Heading size="md">My rooms</Heading>
+            <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
+              {rooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
+            </Stack>
+          </>}
 
           {joinedRooms.length !== 0 && <>
             <Divider my={2} />

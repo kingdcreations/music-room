@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from 'react';
 import { Track } from '../types/database';
 import AudioController from '../components/AudioController';
 import { Audio } from 'expo-av';
+import { MUSIC_ROOM_API } from '@env'
 
 export const AudioContext = createContext<
     {
@@ -36,7 +37,7 @@ export default function AudioProvider({ children }: { children: React.ReactNode 
                 setData(currentSong)
                 setRoomID(roomID)
                 const { sound } = await Audio.Sound.createAsync({
-                    uri: `http://10.0.0.3:3000/song/${currentSong.id}`
+                    uri: `http://${MUSIC_ROOM_API}:3000/song/${currentSong.songId}`
                 })
                 setSound(sound);
                 await sound.playFromPositionAsync(currentTime)

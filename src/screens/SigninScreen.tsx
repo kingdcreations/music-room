@@ -5,7 +5,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { RootStackScreenProps } from '../types';
 import { Button, FormControl, ScrollView, useToast } from 'native-base';
 import Card from '../components/Card';
-import { addDoc, collection } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import Input from '../components/Input';
 
 export default function SigninScreen({
@@ -21,10 +21,9 @@ export default function SigninScreen({
   const signin = () => {
     createUserWithEmailAndPassword(firebase.auth, mail, pass)
       .then(() => {
-        addDoc(collection(firebase.firestore, 'users/' + firebase.auth.currentUser?.uid), {
-          mail: firebase.auth.currentUser?.email,
-          verified: firebase.auth.currentUser?.emailVerified,
-        })
+        setDoc(doc(firebase.firestore, 'users/' + firebase.auth.currentUser?.uid), {
+          email: firebase.auth.currentUser?.email,
+        }, { merge:true })
       })
       .catch(e => toast.show({ description: e.code }))
   }

@@ -22,14 +22,12 @@ export default function GoogleAuthButton() {
     useEffect(() => {
         if (response?.type === 'success') {
             const credential = GoogleAuthProvider.credential(response.params.id_token);
-            signInWithCredential(firebase.auth, credential).then(() => {
-                setDoc(doc(firebase.firestore, 'users/' + firebase.auth.currentUser?.uid), {
-                    mail: firebase.auth.currentUser?.email,
-                    verified: firebase.auth.currentUser?.emailVerified,
+            signInWithCredential(firebase.auth, credential)
+                .then(() => setDoc(doc(firebase.firestore, 'users/' + firebase.auth.currentUser?.uid), {
+                    email: firebase.auth.currentUser?.email,
                     displayName: firebase.auth.currentUser?.displayName,
                     photoURL: firebase.auth.currentUser?.photoURL,
-                })
-            })
+                }, { merge:true }))
         }
     }, [response]);
 

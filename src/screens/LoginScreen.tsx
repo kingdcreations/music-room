@@ -8,6 +8,7 @@ import { useToast } from 'native-base';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import GoogleAuthButton from '../components/GoogleAuthButton';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function LoginScreen({
   navigation
@@ -21,6 +22,11 @@ export default function LoginScreen({
 
   const login = () => {
     signInWithEmailAndPassword(firebase.auth, mail, pass)
+      .then(() => {
+        setDoc(doc(firebase.firestore, 'users/' + firebase.auth.currentUser?.uid), {
+          email: firebase.auth.currentUser?.email,
+        }, { merge:true })
+      })
       .catch(e => toast.show({ description: e.code }))
   };
 
