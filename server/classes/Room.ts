@@ -35,7 +35,7 @@ export default class Room {
 
         // Load current song if exists
         if (currentSong) {
-            const song = await ytdl.getBasicInfo(`https://www.youtube.com/watch?v=${currentSong?.id}`)
+            const song = await ytdl.getBasicInfo(`https://www.youtube.com/watch?v=${currentSong?.songId}`)
             const duration = parseInt(song.player_response.videoDetails.lengthSeconds) * 1000
             setTimeout(() => this.onSongEnd(), duration)
 
@@ -69,10 +69,11 @@ export default class Room {
             // Remove the next song from the queue
             await admin.database()
                 .ref(`/playlists/${this.data.key}/queue/${nextSongKey}`).remove()
+ //WIP
             console.log(`Removing ${nextSongData.title} from queue`);
 
             // Get song duration and launch function at the end
-            const song = await ytdl.getBasicInfo(`https://www.youtube.com/watch?v=${nextSongData?.id}`)
+            const song = await ytdl.getBasicInfo(`https://www.youtube.com/watch?v=${nextSongData?.songId}`)
             const duration = parseInt(song.player_response.videoDetails.lengthSeconds) * 1000
             setTimeout(() => this.onSongEnd(), duration)
 
@@ -94,12 +95,12 @@ export default class Room {
 
     async downloadSong(song: Track) {
         return new Promise<void>((resolve) => {
-            const output = path.resolve(__dirname, `../downloads/${song.id}.mp3`);
+            const output = path.resolve(__dirname, `../downloads/${song.songId}.mp3`);
             fs.access(output, fs.constants.F_OK, (err) => {
                 if (err) { // File not downloaded yet
-                    console.log(`Downloading from id ${song.id}`);
+                    console.log(`Downloading from id ${song.songId}`);
 
-                    const stream = ytdl(encodeURI(`https://www.youtube.com/watch?v=${song.id}`), {
+                    const stream = ytdl(encodeURI(`https://www.youtube.com/watch?v=${song.songId}`), {
                         filter: 'audioonly',
                     })
                     stream.pipe(fs.createWriteStream(output))

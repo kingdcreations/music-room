@@ -1,10 +1,11 @@
 export type Track = {
-    id: string,
-    dbId?: string,
+    key?: string,
+    songId: string,
     title: string,
     author: string,
     thumbnailUrl: string,
-    vote: number
+    vote: number,
+    votes: string[]
 }
 
 export type Room = {
