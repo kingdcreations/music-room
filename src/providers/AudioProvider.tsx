@@ -36,7 +36,7 @@ export default function AudioProvider({ children }: { children: React.ReactNode 
                 setData(currentSong)
                 setRoomID(roomID)
                 const { sound } = await Audio.Sound.createAsync({
-                    uri: `http://10.0.0.3:3000/song/${currentSong.id}`
+                    uri: `http://10.0.0.3:3000/song/${currentSong.songId}`
                 })
                 setSound(sound);
                 await sound.playFromPositionAsync(currentTime)
