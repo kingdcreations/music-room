@@ -3,9 +3,10 @@ import { StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '../constants/Colors';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { AudioContextType } from '../providers/AudioProvider';
 
-export default function AudioController(props: any) {
-    if (!props.roomID) return null
+export default function AudioController({ data, room, stop }: AudioContextType) {
+    if (!room) return null
     return (
         <HStack
             style={styles.container}
@@ -16,8 +17,8 @@ export default function AudioController(props: any) {
             px={3}
         >
             <AspectRatio bgColor={Colors.background} h="100%" ratio={1}>
-                {props.data ?
-                    <Image src={props.data?.thumbnailUrl} alt="Song illustration" />
+                {data ?
+                    <Image src={data?.track.thumbnailUrl} alt="Song illustration" />
                     :
                     <View justifyContent='center' alignItems='center'>
                         <MaterialCommunityIcons name="sleep" size={20} color="white" />
@@ -25,11 +26,11 @@ export default function AudioController(props: any) {
             </AspectRatio>
 
             <VStack justifyContent="center" flexGrow={0} flexShrink={1}>
-                <Text fontSize={12} bold isTruncated>{props.data?.title || "Waiting for song..."}</Text>
-                {props.data?.author && <Text fontSize={12} isTruncated>{props.data?.author}</Text>}
+                <Text fontSize={12} bold isTruncated>{data?.track.title || "Waiting for song..."}</Text>
+                {data?.track.author && <Text fontSize={12} isTruncated>{data?.track.author}</Text>}
             </VStack>
 
-            <IconButton onPress={() => props.stop()} marginLeft="auto" size='40px' variant='none' _icon={{
+            <IconButton onPress={stop} marginLeft="auto" size='40px' variant='none' _icon={{
                 as: Ionicons,
                 size: '25px',
                 name: "close"

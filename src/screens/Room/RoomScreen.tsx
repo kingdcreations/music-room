@@ -33,7 +33,7 @@ export default function RoomScreen({
       .then((res) => res.json())
 
     if (currentSong) {
-      await audio?.play(currentSong, currentTime, route.params.room.id)
+      audio?.play(currentSong, currentTime, route.params.room)
       setCurrentSong(currentSong)
     }
   }
@@ -48,9 +48,9 @@ export default function RoomScreen({
     return onValue(currentSongRef, (childSnapshot) => {
       const song = childSnapshot.val()
       setCurrentSong(song)
-      if (audio?.roomID === route.params.room.id) play()
+      // if (audio?.roomID === route.params.room.id) play()
     });
-  }, [audio?.roomID])
+  }, [audio?.room?.id])
 
   // Update queue
   useEffect(() => {
@@ -121,7 +121,7 @@ export default function RoomScreen({
               }} />
             </HStack>
 
-            {audio?.roomID === route.params.room.id ?
+            {audio?.room?.id === route.params.room.id ?
               <IconButton onPress={stop} size='40px' variant="solid" _icon={{
                 as: Ionicons,
                 name: "stop-outline"

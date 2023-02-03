@@ -1,4 +1,3 @@
-
 export type Track = {
     key?: string,
     songId: string,
@@ -7,6 +6,11 @@ export type Track = {
     thumbnailUrl: string,
     vote: number
     votes: string[]
+}
+
+export type TrackData = {
+    track: Track,
+    startTime: number,
 }
 
 export type User = {

@@ -6,7 +6,7 @@ import Card from '../../components/Card';
 import { HomeStackScreenProps } from '../../types';
 import { push, ref, set } from 'firebase/database';
 import Input from '../../components/Input';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
+import HourSelect from '../../components/HourSelect';
 
 export default function AddRoomScreen({
   navigation
@@ -18,7 +18,8 @@ export default function AddRoomScreen({
   const [privateEdition, setPrivateEdition] = useState(false)
   const [custom, setCustom] = useState(false)
 
-  const [startTime, setStartTime] = useState(new Date())
+  const [startTime, setStartTime] = useState("16")
+  const [endTime, setEndTime] = useState("18")
 
   const createRoom = () => {
     set(push(ref(firebase.database, 'rooms')), {
@@ -74,8 +75,16 @@ export default function AddRoomScreen({
             </HStack>}
             {custom &&
               <VStack>
-                <Button>Start time</Button>
-                <Button>End time</Button>
+                <HStack alignItems={'center'} space={3}>
+                  <VStack flexGrow={1} space={2}>
+                    <Text>Start time</Text>
+                    <HourSelect selectedValue={startTime} placeholder="Start time" onValueChange={setStartTime} />
+                  </VStack>
+                  <VStack flexGrow={1} space={2}>
+                    <Text>End time</Text>
+                    <HourSelect selectedValue={endTime} placeholder="End time" onValueChange={setEndTime} />
+                  </VStack>
+                </HStack>
               </VStack>
             }
           </VStack>
