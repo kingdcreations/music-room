@@ -5,6 +5,8 @@ import ytdl from "ytdl-core";
 import path from "path";
 import fs from "fs";
 
+const ffmpeg = require('fluent-ffmpeg');
+
 export default class Room {
     data: DataSnapshot
 
@@ -48,19 +50,19 @@ export default class Room {
     async loadNextSong() {
         const currentSongRef = admin.database().ref(`/playlists/${this.data.key}/currentSong`)
         const currentSong = (await currentSongRef.get()).val()
-        
+
         const queueSongRef = admin.database().ref(`/playlists/${this.data.key}/queue`)
-        var nextSong: Array<string|Track> = []
+        var nextSong: Array<string | Track> = []
 
         // Find the most voted song in the DB
         await queueSongRef.orderByChild('vote').limitToLast(1).get()
-        .then((snapshot) => {
-            const data = snapshot.val();
-            if (snapshot.exists()) {
-                nextSong = [Object.entries<Track>(data)[0][0], Object.entries<Track>(data)[0][1]]
-            }
-        })
-        
+            .then((snapshot) => {
+                const data = snapshot.val();
+                if (snapshot.exists()) {
+                    nextSong = [Object.entries<Track>(data)[0][0], Object.entries<Track>(data)[0][1]]
+                }
+            })
+
         // If there is no current song and a next song is available
         if (!currentSong && nextSong.length === 2) {
             const nextSongKey = nextSong[0] as string
@@ -69,7 +71,7 @@ export default class Room {
             // Remove the next song from the queue
             await admin.database()
                 .ref(`/playlists/${this.data.key}/queue/${nextSongKey}`).remove()
- //WIP
+            //WIP
             console.log(`Removing ${nextSongData.title} from queue`);
 
             // Get song duration and launch function at the end
@@ -103,8 +105,10 @@ export default class Room {
                     const stream = ytdl(encodeURI(`https://www.youtube.com/watch?v=${song.songId}`), {
                         filter: 'audioonly',
                     })
-                    stream.pipe(fs.createWriteStream(output))
-                    stream.on("finish", resolve);
+                    ffmpeg(stream)
+                        .audioBitrate(128)
+                        .save(output)
+                        .on('end', resolve);
                 } else {
                     resolve()
                 }

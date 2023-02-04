@@ -29,7 +29,7 @@ if (!fs.existsSync(downloadsDir)) fs.mkdirSync(downloadsDir);
 const app = express()
 app.get("/song/:id", (req, res) => {
   res.set({
-    'Content-Type': 'audio/mpeg',
+    'Content-Type': 'audio/mpeg3',
   });
 
   const output = path.resolve(__dirname, `downloads/${req.params.id}.mp3`);

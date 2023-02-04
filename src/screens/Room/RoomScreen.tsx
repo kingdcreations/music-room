@@ -20,14 +20,6 @@ export default function RoomScreen({
   const [currentSong, setCurrentSong] = useState<Track | null>(null)
   const [queue, setQueue] = useState<Track[]>([])
 
-  const addSong = () => {
-    navigation.navigate('AddSong', { room: route.params.room })
-  }
-
-  const addUser = () => {
-    navigation.navigate('Users', { room: route.params.room })
-  }
-
   const play = async () => {
     const { currentSong, currentTime } = await fetch(`http://${MUSIC_ROOM_API}:3000/room/${route.params.room.id}`)
       .then((res) => res.json())
@@ -38,9 +30,10 @@ export default function RoomScreen({
     }
   }
 
-  const stop = async () => {
-    await audio?.stop()
-  }
+  const stop = async () => await audio?.stop()
+
+  const addSong = () => navigation.navigate('AddSong', { room: route.params.room })
+  const addUser = () => navigation.navigate('Users', { room: route.params.room })
 
   // Update songs
   useEffect(() => {
@@ -48,7 +41,7 @@ export default function RoomScreen({
     return onValue(currentSongRef, (childSnapshot) => {
       const song = childSnapshot.val()
       setCurrentSong(song)
-      // if (audio?.roomID === route.params.room.id) play()
+      if (audio?.room?.id === route.params.room.id) play()
     });
   }, [audio?.room?.id])
 
@@ -68,7 +61,7 @@ export default function RoomScreen({
     });
   }, [])
 
-  const isAdmin = () => route.params.room.owner.uid === firebase.auth.currentUser?.uid
+  const isOwner = () => route.params.room.owner.uid === firebase.auth.currentUser?.uid
 
   return (
     <View style={styles.container}>
@@ -104,12 +97,12 @@ export default function RoomScreen({
                 size: '5',
                 name: "music-note-plus"
               }} />
-              {isAdmin() && route.params.room.private && <IconButton onPress={addUser} variant="link" _icon={{
+              {isOwner() && route.params.room.private && <IconButton onPress={addUser} variant="link" _icon={{
                 as: MaterialIcons,
                 size: '5',
                 name: "person-add-alt-1"
               }} />}
-              {isAdmin() && route.params.room.private && <IconButton variant="link" _icon={{
+              {isOwner() && route.params.room.private && <IconButton variant="link" _icon={{
                 as: MaterialCommunityIcons,
                 size: '5',
                 name: "trash-can"
