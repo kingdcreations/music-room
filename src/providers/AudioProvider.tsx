@@ -1,28 +1,39 @@
-import { createContext, useEffect, useState } from 'react';
-import { Room, Track, TrackData } from '../types/database';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { Room, TrackData } from '../types/database';
 import AudioController from '../components/AudioController';
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
 import { MUSIC_ROOM_API } from '@env'
+import { onValue, ref } from 'firebase/database';
+import { FirebaseContext } from './FirebaseProvider';
 
-export const AudioContext = createContext<AudioContextType | undefined>(undefined)
+const AudioContext = createContext<AudioContextType>(null!)
+
+export const useAudio = () => {
+    const audioContext = useContext(AudioContext);
+    if (!audioContext) throw new Error(
+        "useAudio has to be used within <AudioContext.Provider>"
+    );
+    return audioContext;
+};
 
 export default function AudioProvider({ children }: { children: React.ReactNode }) {
+    // Private
+    const firebase = useContext(FirebaseContext)
     const [sound, setSound] = useState<Audio.Sound>(new Audio.Sound());
+
+    // Public
     const [data, setData] = useState<TrackData | null>(null)
     const [room, setRoom] = useState<Room | null>(null)
 
-    const stop = async () => {
-        console.log('Unloading sound from stop()');
-        sound?.unloadAsync()
+    const join = (room: Room) => setRoom(room)
+
+    const quit = () => {
+        // Close player and unload
+        setRoom(null)
         setData(null)
-        setRoom(null) // Close player
     }
 
-    const play = (track: Track, startTime: number, room: Room) => {
-        setData({ track, startTime })
-        setRoom(room)
-    }
-
+    // Init audio provider
     useEffect(() => {
         Audio.setAudioModeAsync({
             playsInSilentModeIOS: true,
@@ -31,48 +42,51 @@ export default function AudioProvider({ children }: { children: React.ReactNode 
         })
     }, []);
 
+    // Load current song if room joined
     useEffect(() => {
-        const playSong = async () => {
-            if (data) {
-                try {
-                    sound.unloadAsync()
-                    console.log("Load song " + data.track.songId);
-                    const { sound: newSound } = await Audio.Sound.createAsync(
-                        // Source
-                        { uri: `http://${MUSIC_ROOM_API}:3000/song/${data.track.songId}` },
-                        // Initialisation values
-                        {
-                            shouldPlay: true,
-                            positionMillis: data.startTime,
-                        },
-                        // Events
-                        (playbackStatus) => {
-                            if (playbackStatus.isLoaded) {
-                                
-                                // Sound ended
-                                if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
-                                    console.log('Ended ' + data?.track.songId);
-                                    sound?.unloadAsync()
-                                    setData(null)
-                                }
+        if (room) {
+            const q = ref(firebase.database, `playlists/${room.id}/currentSong`)
+            return onValue(q, (dataSnapshot) => {
+                if (dataSnapshot.exists()) {
+                    fetch(`http://${MUSIC_ROOM_API}:3000/room/${room.id}`)
+                        .then((res) => res.json())
+                        .then(({ currentSong, currentTime }) => {
+                            if (currentSong && currentTime) {
+                                setData({ track: currentSong, startTime: currentTime })
                             }
                         })
-                    setSound(newSound);
-                } catch (e) {
-                    console.log(e);
-                }
-            }
+                } else setData(null)
+            })
         }
-        playSong()
+    }, [room])
+
+    // Play current song if available
+    useEffect(() => {
+        if (data) Audio.Sound.createAsync(
+            // Source
+            { uri: `http://${MUSIC_ROOM_API}:3000/song/${data.track.songId}` },
+            // Initialisation values
+            {
+                shouldPlay: true,
+                positionMillis: data.startTime,
+            },
+            // Events
+            (playbackStatus) => {
+                if (playbackStatus.isLoaded) {
+                    // Sound ended
+                    if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
+                        setData(null)
+                    }
+                }
+            })
+            .then(({ sound: newSound }) => setSound(newSound))
+            .catch(e => console.error(e))
 
         // Unload sound
-        return () => {
-            console.log('Unloading sound from useEffect');
-            sound?.unloadAsync()
-        }
+        return () => { sound?.unloadAsync() }
     }, [data]);
 
-    const value = { play, stop, data, room }
+    const value = { join, quit, data, room }
     return (
         <AudioContext.Provider value={value}>
             {children}
@@ -84,6 +98,6 @@ export default function AudioProvider({ children }: { children: React.ReactNode 
 export type AudioContextType = {
     data: TrackData | null;
     room: Room | null;
-    play: (track: Track, startTime: number, room: Room) => (void);
-    stop: () => Promise<void>;
+    join: (room: Room) => (void);
+    quit: () => (void);
 }

@@ -5,7 +5,7 @@ import Colors from '../constants/Colors';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { AudioContextType } from '../providers/AudioProvider';
 
-export default function AudioController({ data, room, stop }: AudioContextType) {
+export default function AudioController({ data, room, quit }: AudioContextType) {
     if (!room) return null
     return (
         <HStack
@@ -18,7 +18,7 @@ export default function AudioController({ data, room, stop }: AudioContextType) 
         >
             <AspectRatio bgColor={Colors.background} h="100%" ratio={1}>
                 {data ?
-                    <Image src={data?.track.thumbnailUrl} alt="Song illustration" />
+                    <Image src={data.track.thumbnailUrl} alt="Song illustration" />
                     :
                     <View justifyContent='center' alignItems='center'>
                         <MaterialCommunityIcons name="sleep" size={20} color="white" />
@@ -30,7 +30,7 @@ export default function AudioController({ data, room, stop }: AudioContextType) 
                 {data?.track.author && <Text fontSize={12} isTruncated>{data?.track.author}</Text>}
             </VStack>
 
-            <IconButton onPress={stop} marginLeft="auto" size='40px' variant='none' _icon={{
+            <IconButton onPress={quit} marginLeft="auto" size='40px' variant='none' _icon={{
                 as: Ionicons,
                 size: '25px',
                 name: "close"

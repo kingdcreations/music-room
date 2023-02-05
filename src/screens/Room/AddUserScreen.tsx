@@ -37,7 +37,7 @@ export default function AddUserScreen({
         })
         setUsers(uniqueUsers)
       })
-      .catch(error => console.log(error))
+      .catch(e => console.error(e))
       .finally(() => setIsLoading(false))
   }
 

@@ -36,8 +36,8 @@ export default function AddSongScreen({
     fetch('https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=10&type=video&q='
       + encodeURIComponent(search) + '&key=' + FIREBASE_API_KEY)
       .then(response => response.json())
-      .then((data) => setTracks(data.items))
-      .catch(error => console.log(error))
+      .then(data => setTracks(data.items))
+      .catch(e => console.error(e))
       .finally(() => setIsLoading(false))
   }
 

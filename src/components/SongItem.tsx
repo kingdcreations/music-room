@@ -1,5 +1,5 @@
 import { Track } from '../types/database';
-import { HStack, Image, Text, View, VStack } from 'native-base';
+import { HStack, Image, Text, VStack } from 'native-base';
 import React, { useContext, useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -20,14 +20,13 @@ export default function SongItem({ song, playing, roomId }:
       if (!voteToggle) {
         tmpVotes.push(firebase.auth.currentUser.uid)
         setVoteToggle(true);
-      }
-      else {
+      } else {
         tmpVotes = tmpVotes.filter((item) => item !== firebase.auth.currentUser?.uid)
         setVoteToggle(false);
       }
       song.vote = tmpVotes.length
       song.votes = tmpVotes;
-      updateSong['/playlists/' + roomId + '/queue/' + song.key] = song
+      updateSong[`/playlists/${roomId}/queue/${song.roomId}`] = song
       update(ref(firebase.database), updateSong);
     }
   }

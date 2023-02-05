@@ -1,5 +1,5 @@
 export type Track = {
-    key?: string,
+    roomId?: string,
     songId: string,
     title: string,
     author: string,

@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { Auth, initializeAuth, signInWithEmailAndPassword, updatePassword } from "firebase/auth";
 import { Firestore, getFirestore } from "firebase/firestore";
-import { Database, getDatabase, push, ref, update } from "firebase/database";
+import { Database, getDatabase, push, ref } from "firebase/database";
 import { getReactNativePersistence } from 'firebase/auth/react-native';
 
 import {
@@ -50,15 +50,12 @@ export default class Firebase {
 
     addSongToPlaylist = async (song: Track, roomID: string) => {
         const playlistRef = ref(this.database, 'playlists/' + roomID + '/queue');
-        const songKey = push(playlistRef, song)
-        song.key = songKey.key as string
-        const songRef = ref(this.database, 'playlists/' + roomID + '/queue/' + song.key);
-        update(songRef, song)
+        await push(playlistRef, song)
     }
 
     addUserToRoom = async (user: User, roomID: string) => {
         const playlistRef = ref(this.database, 'joins');
-        push(playlistRef, {
+        await push(playlistRef, {
             user,
             roomID
         })
