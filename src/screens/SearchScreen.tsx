@@ -24,7 +24,7 @@ export default function SearchScreen() {
           return ([...rooms, room as Room])
         }));
       }
-    });
+    }, (e) => console.error(e));
   }, [])
 
   return (

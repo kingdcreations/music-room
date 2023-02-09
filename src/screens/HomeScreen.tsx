@@ -31,7 +31,7 @@ export default function HomeScreen({
           return [...rooms, newRoom]
         }));
       }
-    });
+    }, (e) => console.error(e));
   }, [])
 
   useEffect(() => {

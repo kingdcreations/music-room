@@ -25,6 +25,11 @@ export default function AddRoomScreen({
     set(push(ref(firebase.database, 'rooms')), {
       name: roomName,
       private: privateRoom,
+      privateVoting,
+      privateEdition,
+      custom,
+      startTime,
+      endTime,
       owner: {
         uid: firebase.auth.currentUser?.uid,
         displayName: firebase.auth.currentUser?.displayName,

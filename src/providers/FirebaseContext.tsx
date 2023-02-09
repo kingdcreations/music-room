@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { Auth, initializeAuth, signInWithEmailAndPassword, updatePassword } from "firebase/auth";
 import { Firestore, getFirestore } from "firebase/firestore";
-import { Database, getDatabase, push, ref } from "firebase/database";
+import { Database, getDatabase, push, ref, set } from "firebase/database";
 import { getReactNativePersistence } from 'firebase/auth/react-native';
 
 import {
@@ -55,9 +55,8 @@ export default class Firebase {
 
     addUserToRoom = async (user: User, roomID: string) => {
         const playlistRef = ref(this.database, 'joins');
-        await push(playlistRef, {
-            user,
-            roomID
-        })
+        await push(playlistRef, { user, roomID })
+        const userRef = ref(this.database, 'rooms/' + roomID + '/users/' + user.uid);
+        await set(userRef, true)
     }
 }
