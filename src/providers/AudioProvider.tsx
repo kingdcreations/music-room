@@ -31,6 +31,7 @@ export default function AudioProvider({ children }: { children: React.ReactNode 
         // Close player and unload
         setRoom(null)
         setData(null)
+        sound.unloadAsync()
     }
 
     // Init audio provider
