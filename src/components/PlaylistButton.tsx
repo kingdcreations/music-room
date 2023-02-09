@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import { onValue, ref } from 'firebase/database';
-import { AspectRatio, Image, Text, View } from 'native-base';
+import { AspectRatio, Image, Text, View, VStack } from 'native-base';
 import { useContext, useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import Colors from '../constants/Colors';
@@ -26,10 +26,12 @@ export default function PlaylistButton({ room }: { room: Room }) {
 
     return (
         <View p={2} w={{ base: '50%', md: '25%' }}>
-            <TouchableOpacity onPress={openRoom}>
-                {room.private && <View top={3} right={3} position={'absolute'} zIndex={5}>
-                    <MaterialCommunityIcons name="lock" size={25} color="grey" />
-                </View>}
+            <TouchableOpacity onPress={openRoom}> 
+                <VStack top={3} right={3} position={'absolute'} zIndex={5} space={2}>
+                    {room.private && <MaterialCommunityIcons name="lock" size={25} color="grey" />}
+                    {room.privateEdition && <MaterialCommunityIcons name="upload-lock" size={25} color="grey" />}
+                    {room.privateVoting && <MaterialCommunityIcons name="garage-lock" size={25} color="grey" />}
+                </VStack>
                 <AspectRatio
                     w="100%"
                     borderWidth={1}

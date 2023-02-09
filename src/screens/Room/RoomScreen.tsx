@@ -20,12 +20,16 @@ export default function RoomScreen({
   const [queue, setQueue] = useState<Track[]>([])
 
   const room = route.params.room
+  const uid = firebase.auth.currentUser?.uid
 
-  const isOwner = () => room.owner.uid === firebase.auth.currentUser?.uid
+  const isOwner = () => room.owner.uid === uid
+  const isEditor = () => room.users && uid && Object.keys(room.users).includes(uid)
 
   const addSong = () => navigation.navigate('AddSong', { room })
   const addUser = () => navigation.navigate('Users', { room })
 
+  console.log(isEditor());
+  
   // Get current song
   useEffect(() => {
     const q = ref(firebase.database, `playlists/${room.id}/currentSong`)
@@ -78,26 +82,21 @@ export default function RoomScreen({
 
           <HStack w='100%' alignItems="center" justifyContent="space-between">
             <HStack alignItems="center">
-              <IconButton mr={2} onPress={addSong} variant="outline" _icon={{
+              <IconButton mr={2} isDisabled={!isEditor() && !isOwner()} onPress={addSong} variant="outline" _icon={{
                 as: MaterialCommunityIcons,
                 size: '5',
                 name: "music-note-plus"
               }} />
-              {isOwner() && room.private && <IconButton onPress={addUser} variant="link" _icon={{
+              {isOwner() && (room.private || room.privateEdition || room.privateVoting) && <IconButton onPress={addUser} variant="link" _icon={{
                 as: MaterialIcons,
                 size: '5',
                 name: "person-add-alt-1"
               }} />}
-              {isOwner() && room.private && <IconButton variant="link" _icon={{
+              {/* {isOwner() && room.private && <IconButton variant="link" _icon={{
                 as: MaterialCommunityIcons,
                 size: '5',
                 name: "trash-can"
-              }} />}
-              <IconButton variant="link" _icon={{
-                as: MaterialCommunityIcons,
-                size: '5',
-                name: "share-variant"
-              }} />
+              }} />} */}
             </HStack>
 
             {audio.room?.id === room.id ?

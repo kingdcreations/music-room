@@ -33,6 +33,11 @@ export type Room = {
         displayName: string,
         photoURL: string,
     };
+    users?: [{
+        [key: string]: boolean
+    }]
     private: boolean;
+    privateEdition: boolean;
+    privateVoting: boolean;
     currentSong?: Track;
 };
