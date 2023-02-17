@@ -28,8 +28,6 @@ export default function RoomScreen({
   const addSong = () => navigation.navigate('AddSong', { room })
   const addUser = () => navigation.navigate('Users', { room })
 
-  console.log(isEditor());
-  
   // Get current song
   useEffect(() => {
     const q = ref(firebase.database, `playlists/${room.id}/currentSong`)

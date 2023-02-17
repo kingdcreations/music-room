@@ -1,6 +1,6 @@
 import { Select } from "native-base";
 
-export default function HourSelct(props: any) {
+export default function HourSelect(props: any) {
     const hours = Array.from(Array(24).keys())
 
     return (
@@ -14,7 +14,7 @@ export default function HourSelct(props: any) {
             {...props}>
 
             {hours.map((hour) =>
-                <Select.Item label={hour.toString() + 'h'} value={hour.toString()} />)}
+                <Select.Item key={hour} label={hour.toString() + 'h'} value={hour.toString()} />)}
         </Select>
     )
 }

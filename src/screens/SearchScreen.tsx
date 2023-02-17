@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
-import { ScrollView, Stack, View } from 'native-base';
+import { ScrollView, Spinner, Stack, View } from 'native-base';
 import { FirebaseContext } from '../providers/FirebaseProvider';
 import Card from '../components/Card';
 import { equalTo, onValue, orderByChild, query, ref } from 'firebase/database';
@@ -9,9 +9,11 @@ import PlaylistButton from '../components/PlaylistButton';
 
 export default function SearchScreen() {
   const firebase = useContext(FirebaseContext)
+  const [loading, setLoading] = useState(false)
   const [rooms, setRooms] = useState<Room[]>([])
 
   useEffect(() => {
+    setLoading(true)
     const q = query(ref(firebase.database, 'rooms'), orderByChild('private'), equalTo(false));
     return onValue(q, (snapshot) => {
       const data = snapshot.val();
@@ -24,6 +26,7 @@ export default function SearchScreen() {
           return ([...rooms, room as Room])
         }));
       }
+      setLoading(false)
     }, (e) => console.error(e));
   }, [])
 
@@ -32,7 +35,9 @@ export default function SearchScreen() {
       <ScrollView w="100%">
         <Card p={5}>
           <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
-            {rooms.map((room, i) => <PlaylistButton room={room} key={i} />)}
+            {!loading ? rooms.map((room, i) => <PlaylistButton room={room} key={i} />)
+            :
+            <Spinner size="lg" />}
           </Stack>
         </Card>
       </ScrollView>
