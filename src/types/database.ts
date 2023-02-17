@@ -1,3 +1,5 @@
+import { LocationObjectCoords } from 'expo-location/build/Location.types';
+
 export type Track = {
     roomId?: string,
     songId: string,
@@ -40,4 +42,8 @@ export type Room = {
     privateEdition: boolean;
     privateVoting: boolean;
     currentSong?: Track;
+    custom: boolean;
+    startTime: number;
+    endTime: number;
+    location: LocationObjectCoords
 };

@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 import { useContext, useEffect, useState } from 'react';
-import { AspectRatio, Avatar, Button, Divider, VStack, HStack, IconButton, ScrollView, Text, View, Image } from 'native-base';
+import { AspectRatio, Avatar, Button, Divider, VStack, HStack, IconButton, ScrollView, Text, View, Image, Box } from 'native-base';
 import Card from '../../components/Card';
 import { HomeStackScreenProps } from '../../types';
 import SongItem from '../../components/SongItem';
@@ -10,6 +10,13 @@ import { FirebaseContext } from '../../providers/FirebaseProvider';
 import { useAudio } from '../../providers/AudioProvider';
 import Colors from '../../constants/Colors';
 import { MaterialIcons, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import MapView from 'react-native-maps/lib/MapView';
+import { PROVIDER_GOOGLE } from 'react-native-maps';
+import { MapMarker } from 'react-native-maps/lib/MapMarker';
+import { MapCircle } from 'react-native-maps/lib/MapCircle';
+import * as Location from 'expo-location';
+import { LocationObjectCoords } from 'expo-location';
+import { getDistance } from 'geolib';
 
 export default function RoomScreen({
   route, navigation
@@ -18,12 +25,43 @@ export default function RoomScreen({
   const audio = useAudio()
   const [currentSong, setCurrentSong] = useState<Track | null>(null)
   const [queue, setQueue] = useState<Track[]>([])
+  const [location, setLocation] = useState<LocationObjectCoords | null>(null)
 
   const room = route.params.room
   const uid = firebase.auth.currentUser?.uid
 
+  useEffect(() => {
+    if (room.custom) (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+
+      const location = await Location.getCurrentPositionAsync();
+      setLocation(location.coords)
+    })();
+  }, [room.custom]);
+
   const isOwner = () => room.owner.uid === uid
   const isEditor = () => room.users && uid && Object.keys(room.users).includes(uid)
+  const isInTimeRange = () => {
+    const currentHour = (new Date().getUTCHours() + 1)
+    const startHour = room.startTime
+    const endHour = startHour < room.endTime ? room.endTime : (room.endTime + 24)
+    return startHour <= currentHour && currentHour < endHour
+  }
+
+  const isInRadius = () => {
+    if (!location) return false
+
+    const from = {
+      latitude: room.location.latitude,
+      longitude: room.location.longitude,
+    }
+    const to = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+    }
+    return getDistance(from, to) < 1000
+  }
 
   const addSong = () => navigation.navigate('AddSong', { room })
   const addUser = () => navigation.navigate('Users', { room })
@@ -75,12 +113,51 @@ export default function RoomScreen({
             <Text fontSize={12}>{room.owner.displayName}</Text>
           </HStack>
 
+          {!isOwner() && !isEditor() && room.privateVoting && <HStack alignItems="center" space={3}>
+            <MaterialCommunityIcons name="garage-lock" size={25} color="grey" />
+            <Text my={2} color="grey">You can only vote if you have been invited to</Text>
+          </HStack>}
+
+          {!isOwner() && !isEditor() && room.privateEdition && <HStack alignItems="center" space={3}>
+            <MaterialCommunityIcons name="upload-lock" size={25} color="grey" />
+            <Text my={2} color="grey">You can only add songs if you have been invited to</Text>
+          </HStack>}
+
+          {!room.privateVoting && room.custom &&
+            <>
+              {!isInTimeRange() && <HStack alignItems="center" space={3}>
+                <MaterialCommunityIcons name="calendar-clock" size={25} color="grey" />
+                <Text my={2} color="grey">You can only vote between <Text bold color="white">{room.startTime}</Text> and <Text bold color="white">{room.endTime}</Text> hours</Text>
+              </HStack>}
+
+              <Box h={200} w="100%">
+                <MapView
+                  showsUserLocation
+                  style={styles.map}
+                  provider={PROVIDER_GOOGLE}
+                  region={{
+                    ...room.location,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                  }}
+                  focusable
+                >
+                  {room.location && <MapMarker coordinate={room.location} />}
+                  {room.location && <MapCircle center={room.location} strokeColor="#ff0000ff" radius={1000} fillColor="#ff000050" />}
+                </MapView>
+              </Box>
+
+              {!isInRadius() && <Text my={2} textAlign="center" color="grey">
+                You must be in the specific area radius to vote
+              </Text>}
+            </>}
+
           {/* Controls */}
           <Divider />
 
           <HStack w='100%' alignItems="center" justifyContent="space-between">
             <HStack alignItems="center">
-              <IconButton mr={2} isDisabled={!isEditor() && !isOwner()} onPress={addSong} variant="outline" _icon={{
+              <IconButton mr={2} isDisabled={room.privateEdition && !isEditor() && !isOwner()} onPress={addSong} variant="outline" _icon={{
                 as: MaterialCommunityIcons,
                 size: '5',
                 name: "music-note-plus"
@@ -126,5 +203,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  map: {
+    width: '100%',
+    height: '100%',
   },
 });

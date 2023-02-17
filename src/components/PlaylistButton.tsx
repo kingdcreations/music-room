@@ -31,6 +31,7 @@ export default function PlaylistButton({ room }: { room: Room }) {
                     {room.private && <MaterialCommunityIcons name="lock" size={25} color="grey" />}
                     {room.privateEdition && <MaterialCommunityIcons name="upload-lock" size={25} color="grey" />}
                     {room.privateVoting && <MaterialCommunityIcons name="garage-lock" size={25} color="grey" />}
+                    {!room.privateVoting && room.custom && <MaterialCommunityIcons name="calendar-clock" size={25} color="grey" />}
                 </VStack>
                 <AspectRatio
                     w="100%"

@@ -35,7 +35,6 @@ export default function AddRoomScreen({
   const [endTime, setEndTime] = useState("18")
   
   const onMarkerChange = (e: MapPressEvent) => {
-    setRegion
     setMarker(e.nativeEvent.coordinate)
   };
 
@@ -46,8 +45,8 @@ export default function AddRoomScreen({
       privateVoting,
       privateEdition,
       custom,
-      startTime,
-      endTime,
+      startTime: parseInt(startTime),
+      endTime: parseInt(endTime),
       owner: {
         uid: firebase.auth.currentUser?.uid,
         displayName: firebase.auth.currentUser?.displayName,
@@ -117,7 +116,7 @@ export default function AddRoomScreen({
                 </VStack>
                 <Switch onValueChange={setCustom} value={custom} />
               </HStack>}
-              {custom &&
+              {!privateVoting && custom &&
                 <VStack>
                   <Box h={200} mb={5}>
                     <MapView
