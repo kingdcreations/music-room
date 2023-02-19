@@ -5,7 +5,7 @@ import Card from '../../components/Card';
 import { HomeStackScreenProps } from '../../types';
 import SongItem from '../../components/SongItem';
 import { Track } from '../../types/database';
-import { onValue, ref, query, orderByChild } from 'firebase/database';
+import { onValue, ref, query } from 'firebase/database';
 import { FirebaseContext } from '../../providers/FirebaseProvider';
 import { useAudio } from '../../providers/AudioProvider';
 import Colors from '../../constants/Colors';
@@ -44,9 +44,10 @@ export default function RoomScreen({
   const isEditor = () => room.users && uid && Object.keys(room.users).includes(uid)
   const isInTimeRange = () => {
     const currentHour = (new Date().getUTCHours() + 1)
-    const startHour = room.startTime
-    const endHour = startHour < room.endTime ? room.endTime : (room.endTime + 24)
-    return startHour <= currentHour && currentHour < endHour
+    if (room.startTime < room.endTime)
+      return room.startTime <= currentHour && currentHour < room.endTime
+    else
+      return !(room.endTime <= currentHour && currentHour < room.startTime)
   }
 
   const isInRadius = () => {
@@ -66,6 +67,14 @@ export default function RoomScreen({
   const addSong = () => navigation.navigate('AddSong', { room })
   const addUser = () => navigation.navigate('Users', { room })
 
+  const sortSongs = (a: Track, b: Track) => {
+    if ((a.votes ? Object.keys(a.votes).length : 0) < (b.votes ? Object.keys(b.votes).length : 0))
+      return 1
+    else if ((a.votes ? Object.keys(a.votes).length : 0) > (b.votes ? Object.keys(b.votes).length : 0))
+      return -1
+    return 0
+  }
+
   // Get current song
   useEffect(() => {
     const q = ref(firebase.database, `playlists/${room.id}/currentSong`)
@@ -74,13 +83,13 @@ export default function RoomScreen({
 
   // Get queue
   useEffect(() => {
-    const queueRef = query(ref(firebase.database, `playlists/${room.id}/queue`), orderByChild('vote'));
+    const queueRef = query(ref(firebase.database, `playlists/${room.id}/queue`));
     return onValue(queueRef, (childSnapshot) => {
       const queue = childSnapshot.val()
       setQueue(queue ? () => {
         const tmpQueue: Track[] = []
         childSnapshot.forEach((data) => {
-          var song = data.val() as Track
+          const song = data.val() as Track
           if (data.key) song.roomId = data.key
           tmpQueue.unshift(song)
         })
@@ -91,8 +100,8 @@ export default function RoomScreen({
 
   return (
     <View style={styles.container}>
-      <ScrollView w='100%' p={5}>
-        <Card>
+      <ScrollView w='100%'>
+        <Card p={5}>
           {/* Playlist info */}
           <AspectRatio w="50%" bgColor={Colors.card} borderWidth={1} borderColor={Colors.border} ratio={1}>
             {currentSong ? <Image
@@ -189,7 +198,8 @@ export default function RoomScreen({
           {/* Playlist songs */}
           <VStack space={3} marginBottom={5} divider={<Divider />} w="100%">
             {currentSong && <SongItem song={currentSong} playing roomId={room.id} />}
-            {queue.map((song, id) => <SongItem song={song} key={id} roomId={room.id} />)}
+            {queue.sort(sortSongs).map((song, id) =>
+              <SongItem isDisabled={(!isInTimeRange() || !isInRadius()) && !isEditor() && !isOwner()} song={song} key={id} roomId={room.id} />)}
           </VStack>
           {queue.length !== 0 && <Button onPress={addSong}>Add a song</Button>}
         </Card>
