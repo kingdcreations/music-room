@@ -1,16 +1,17 @@
 import { useNavigation } from '@react-navigation/native';
 import { onValue, ref } from 'firebase/database';
 import { AspectRatio, Image, Text, View, VStack } from 'native-base';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import Colors from '../constants/Colors';
-import { FirebaseContext } from '../providers/FirebaseProvider';
-import { Room } from '../types/database';
+import { Room } from '../types/data';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { useFirebase } from '../providers/FirebaseProvider';
 
 export default function PlaylistButton({ room }: { room: Room }) {
+    const firebase = useFirebase()
     const navigation = useNavigation()
-    const firebase = useContext(FirebaseContext)
+
     const [thumbnail, setThumbnail] = useState(null)
 
     const openRoom = () => navigation.navigate('HomeRoot', {
@@ -26,7 +27,7 @@ export default function PlaylistButton({ room }: { room: Room }) {
 
     return (
         <View p={2} w={{ base: '50%', md: '25%' }}>
-            <TouchableOpacity onPress={openRoom}> 
+            <TouchableOpacity onPress={openRoom}>
                 <VStack top={3} right={3} position={'absolute'} zIndex={5} space={2}>
                     {room.private && <MaterialCommunityIcons name="lock" size={25} color="grey" />}
                     {room.privateEdition && <MaterialCommunityIcons name="upload-lock" size={25} color="grey" />}

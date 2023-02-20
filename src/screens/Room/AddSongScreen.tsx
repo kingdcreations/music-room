@@ -1,21 +1,22 @@
 import { Keyboard, StyleSheet, TouchableOpacity } from 'react-native';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { HStack, Icon, IconButton, Image, ScrollView, Spinner, Text, View, VStack } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { FirebaseContext } from '../../providers/FirebaseProvider';
 import { FIREBASE_API_KEY } from '@env';
-import { Track } from '../../types/database';
-import { HomeStackScreenProps } from '../../types';
+import { Track } from '../../types/data';
+import { HomeStackScreenProps } from '../../types/navigation';
 import Input from '../../components/Input';
+import { useFirebase } from '../../providers/FirebaseProvider';
+import Container from '../../components/Container';
 
 export default function AddSongScreen({
   route, navigation
 }: HomeStackScreenProps<'AddSong'>) {
+  const firebase = useFirebase()
+
   const [search, setSearch] = useState("")
   const [tracks, setTracks] = useState([])
   const [isLoading, setIsLoading] = useState(false)
-
-  const firebase = useContext(FirebaseContext)
 
   const addToPlaylist = (track: any) => {
     const newtrack: Track = {
@@ -41,10 +42,9 @@ export default function AddSongScreen({
   }
 
   return (
-    <View style={styles.container}>
+    <Container>
       <Input
-        mx={5}
-        my={2}
+        mb={3}
         value={search}
         onChangeText={setSearch}
         InputRightElement={
@@ -56,30 +56,29 @@ export default function AddSongScreen({
         }
         onSubmitEditing={searchTracks}
         placeholder="What are we listening to ?" />
-      <ScrollView w="100%">
-        <VStack w="100%" alignItems='center' px={5} mb={5} space='4'>
-          {!isLoading && tracks ? tracks.map((track: any, i) => (
-            <TouchableOpacity key={i} onPress={() => addToPlaylist(track)}>
-              <HStack w="100%" space="4" alignItems='center'>
-                <Image
-                  size='sm'
-                  source={{
-                    uri: track.snippet.thumbnails.default.url
-                  }} alt="Alternate Text" />
-                <VStack flexGrow={1} flexShrink={1}>
-                  <Text bold isTruncated>{track.snippet.title}</Text>
-                  <Text isTruncated>{track.snippet.channelTitle}</Text>
-                </VStack>
-                <Icon as={<Ionicons name="add-circle-outline" />} size={5} ml="3" color="dark.400" />
-              </HStack>
-            </TouchableOpacity>
-          ))
-            :
-            <Spinner accessibilityLabel="Loading posts" />
-          }
-        </VStack>
-      </ScrollView>
-    </View>
+
+      <VStack w="100%" alignItems='center' space='4'>
+        {!isLoading && tracks ? tracks.map((track: any, i) => (
+          <TouchableOpacity key={i} onPress={() => addToPlaylist(track)}>
+            <HStack w="100%" space="4" alignItems='center'>
+              <Image
+                size='sm'
+                source={{
+                  uri: track.snippet.thumbnails.default.url
+                }} alt="Alternate Text" />
+              <VStack flexGrow={1} flexShrink={1}>
+                <Text bold isTruncated>{track.snippet.title}</Text>
+                <Text isTruncated>{track.snippet.channelTitle}</Text>
+              </VStack>
+              <Icon as={<Ionicons name="add-circle-outline" />} size={5} ml="3" color="white" />
+            </HStack>
+          </TouchableOpacity>
+        ))
+          :
+          <Spinner accessibilityLabel="Loading posts" />
+        }
+      </VStack>
+    </Container>
   );
 }
 

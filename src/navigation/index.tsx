@@ -1,9 +1,8 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import { RootStackParamList } from '../types';
+import { RootStackParamList } from '../types/navigation';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { FirebaseContext } from '../providers/FirebaseProvider';
 import LoginScreen from '../screens/Auth/LoginScreen'
 import SigninScreen from '../screens/Auth/SigninScreen'
 import RecoverScreen from '../screens/Auth/RecoverScreen';
@@ -13,13 +12,15 @@ import SearchScreen from '../screens/SearchScreen';
 import AccountScreen from '../screens/AccountScreen';
 import HomeStack from './HomeStack';
 import colors from '../constants/Colors';
+import { useFirebase } from '../providers/FirebaseProvider';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const RootStack = createBottomTabNavigator<RootStackParamList>();
 
 export default function Navigation() {
+    const firebase = useFirebase()
+
     const [user, setUser] = useState<User | null>(null);
-    const firebase = useContext(FirebaseContext)
 
     useEffect(() => onAuthStateChanged(firebase.auth, (u) => setUser(u)), []);
 

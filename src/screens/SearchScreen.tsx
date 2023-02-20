@@ -1,14 +1,14 @@
-import { StyleSheet } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
-import { ScrollView, Spinner, Stack, View } from 'native-base';
-import { FirebaseContext } from '../providers/FirebaseProvider';
-import Card from '../components/Card';
+import React, { useEffect, useState } from 'react';
+import { Spinner, Stack } from 'native-base';
+import Container from '../components/Container';
 import { equalTo, onValue, orderByChild, query, ref } from 'firebase/database';
-import { Room } from '../types/database';
+import { Room } from '../types/data';
 import PlaylistButton from '../components/PlaylistButton';
+import { useFirebase } from '../providers/FirebaseProvider';
 
 export default function SearchScreen() {
-  const firebase = useContext(FirebaseContext)
+  const firebase = useFirebase()
+
   const [loading, setLoading] = useState(false)
   const [rooms, setRooms] = useState<Room[]>([])
 
@@ -31,24 +31,13 @@ export default function SearchScreen() {
   }, [])
 
   return (
-    <View style={styles.container}>
-      <ScrollView w="100%">
-        <Card p={5}>
-          <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
-            {!loading ? rooms.map((room, i) => <PlaylistButton room={room} key={i} />)
-            :
-            <Spinner size="lg" />}
-          </Stack>
-        </Card>
-      </ScrollView>
-    </View>
+    <Container>
+      <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
+        {!loading ?
+          rooms.map((room, i) => <PlaylistButton room={room} key={i} />)
+          :
+          <Spinner size="lg" />}
+      </Stack>
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

@@ -1,16 +1,16 @@
-import { Track } from '../types/database';
+import { Track } from '../types/data';
 import { HStack, Image, Text, VStack } from 'native-base';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { FirebaseContext } from '../providers/FirebaseProvider';
 import { ref, remove, set } from 'firebase/database';
 import Colors from '../constants/Colors';
+import { useFirebase } from '../providers/FirebaseProvider';
 
 export default function SongItem({ isDisabled, song, playing, roomId }:
   { isDisabled?: boolean, song: Track, playing?: boolean, roomId: string }) {
+  const firebase = useFirebase()
 
-  const firebase = useContext(FirebaseContext)
   const [voteToggle, setVoteToggle] = useState(false)
 
   const vote = () => {

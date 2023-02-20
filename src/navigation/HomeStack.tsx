@@ -2,7 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import AddRoomScreen from '../screens/Room/AddRoomScreen';
-import { HomeStackParamList } from '../types';
+import { HomeStackParamList } from '../types/navigation';
 import RoomScreen from '../screens/Room/RoomScreen';
 import AddSongScreen from '../screens/Room/AddSongScreen';
 import AddUserScreen from '../screens/Room/AddUserScreen';

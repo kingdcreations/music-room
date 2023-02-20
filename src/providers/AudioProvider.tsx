@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { Room, TrackData } from '../types/database';
+import { Room, TrackData } from '../types/data';
 import AudioController from '../components/AudioController';
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
 import { MUSIC_ROOM_API } from '@env'
 import { onValue, ref } from 'firebase/database';
-import { FirebaseContext } from './FirebaseProvider';
+import { useFirebase } from './FirebaseProvider';
+import { AudioContextType } from '../types/AudioContextType';
 
 const AudioContext = createContext<AudioContextType>(null!)
 
@@ -18,7 +19,7 @@ export const useAudio = () => {
 
 export default function AudioProvider({ children }: { children: React.ReactNode }) {
     // Private
-    const firebase = useContext(FirebaseContext)
+    const firebase = useFirebase()
     const [sound, setSound] = useState<Audio.Sound>(new Audio.Sound());
 
     // Public
@@ -94,11 +95,4 @@ export default function AudioProvider({ children }: { children: React.ReactNode 
             <AudioController {...value} />
         </AudioContext.Provider>
     );
-}
-
-export type AudioContextType = {
-    data: TrackData | null;
-    room: Room | null;
-    join: (room: Room) => (void);
-    quit: () => (void);
 }

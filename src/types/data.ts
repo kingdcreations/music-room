@@ -16,7 +16,7 @@ export type TrackData = {
 
 export type User = {
     uid: string,
-    mail: string,
+    email: string,
     photoURL?: string,
     displayName?: string,
 }

@@ -1,14 +1,14 @@
-import { useContext, useEffect } from 'react';
-import { FirebaseContext } from '../providers/FirebaseProvider';
+import { useEffect } from 'react';
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import * as Google from 'expo-auth-session/providers/google';
 import { Button, Icon } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { FIREBASE_CLIENT_ID } from '@env';
 import { doc, setDoc } from 'firebase/firestore';
+import { useFirebase } from '../providers/FirebaseProvider';
 
 export default function GoogleAuthButton() {
-    const firebase = useContext(FirebaseContext)
+    const firebase = useFirebase()
 
     const isGoogleAuthed = Boolean(firebase.auth.currentUser?.providerData.find((pvd) => pvd.providerId === 'google.com'))
     const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
@@ -35,6 +35,10 @@ export default function GoogleAuthButton() {
             w="100%"
             isDisabled={isGoogleAuthed}
             onPress={login}
+            bg="#DE5246"
+            _pressed={{
+                bg: 'red.600'
+            }}
             leftIcon={<Icon as={Ionicons} name="logo-google" size="sm" />}>
             Sign in with Google
         </Button>

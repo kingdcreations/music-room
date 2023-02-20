@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Colors from '../constants/Colors';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { AudioContextType } from '../providers/AudioProvider';
+import { AudioContextType } from '../types/AudioContextType';
 
 export default function AudioController({ data, room, quit }: AudioContextType) {
     if (!room) return null

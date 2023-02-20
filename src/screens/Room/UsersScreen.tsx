@@ -1,18 +1,18 @@
-import { StyleSheet } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react';
-import { Avatar, Button, HStack, ScrollView, Text, View, VStack } from 'native-base';
-import { FirebaseContext } from '../../providers/FirebaseProvider';
-import { HomeStackScreenProps } from '../../types';
-import { Join, User } from '../../types/database';
+import React, { useEffect, useState } from 'react';
+import { Avatar, Button, HStack, Text, VStack } from 'native-base';
+import { HomeStackScreenProps } from '../../types/navigation';
+import { Join, User } from '../../types/data';
 import Colors from '../../constants/Colors';
-import Card from '../../components/Card';
+import Container from '../../components/Container';
 import { equalTo, onValue, orderByChild, query, ref } from 'firebase/database';
+import { useFirebase } from '../../providers/FirebaseProvider';
 
 export default function UsersScreen({
     route, navigation
 }: HomeStackScreenProps<'Users'>) {
+    const firebase = useFirebase()
+
     const [users, setUsers] = useState<User[]>([])
-    const firebase = useContext(FirebaseContext)
 
     useEffect(() => {
         const q = query(
@@ -33,38 +33,27 @@ export default function UsersScreen({
     })
 
     return (
-        <View style={styles.container}>
-            <ScrollView w="100%">
-                <Card p="5">
-                    <Button w="100%" onPress={addUser}>Add user</Button>
-                    <VStack w="100%" alignItems='center' px={5} py={2} mb={5} space='4'>
-                        {users.map((user: User, i) => (
-                            <HStack key={i} w="100%" space="4" alignItems='center'>
-                                <Avatar
-                                    size='sm'
-                                    bg={Colors.card}
-                                    borderColor={Colors.border}
-                                    borderWidth={1}
-                                    source={{
-                                        uri: user?.photoURL
-                                    }} />
-                                <VStack flexGrow={1} flexShrink={1}>
-                                    {user.displayName && <Text isTruncated>{user.displayName}</Text>}
-                                    {user.mail && <Text isTruncated>{user.mail}</Text>}
-                                </VStack>
-                            </HStack>
-                        ))}
-                    </VStack>
-                </Card>
-            </ScrollView>
-        </View>
+        <Container>
+            <Button mb={3} w="100%" onPress={addUser}>Add user</Button>
+
+            <VStack w="100%" alignItems='center' space='4'>
+                {users.map((user: User, i) => (
+                    <HStack key={i} w="100%" space="4" alignItems='center'>
+                        <Avatar
+                            size='md'
+                            bg={Colors.card}
+                            borderColor={Colors.border}
+                            borderWidth={1}
+                            source={{
+                                uri: user?.photoURL
+                            }} />
+                        <VStack flexGrow={1} flexShrink={1}>
+                            {user.displayName && <Text isTruncated>{user.displayName}</Text>}
+                            {user.email && <Text isTruncated>{user.email}</Text>}
+                        </VStack>
+                    </HStack>
+                ))}
+            </VStack>
+        </Container>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-});
