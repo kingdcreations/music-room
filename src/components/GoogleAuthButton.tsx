@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
+import { GoogleAuthProvider, signInWithCredential } from "firebase/auth/react-native";
 import * as Google from 'expo-auth-session/providers/google';
 import { Button, Icon } from 'native-base';
 import Ionicons from '@expo/vector-icons/Ionicons';

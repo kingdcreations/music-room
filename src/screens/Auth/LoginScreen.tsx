@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { RootStackScreenProps } from '../../types/navigation';
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { Button, Text, Divider, HStack } from 'native-base';
+import { signInWithEmailAndPassword } from "firebase/auth/react-native";
+import { Button, Text, HStack } from 'native-base';
 import { useToast } from 'native-base';
 import Container from '../../components/Container';
 import Input from '../../components/Input';
 import GoogleAuthButton from '../../components/GoogleAuthButton';
 import { doc, setDoc } from 'firebase/firestore';
 import { useFirebase } from '../../providers/FirebaseProvider';
+import OrDivider from '../../components/OrDivider';
 
 export default function LoginScreen({
   navigation
@@ -38,11 +39,7 @@ export default function LoginScreen({
       <Button w="100%" onPress={login}>Login</Button>
       <Button variant="link" onPress={recover}>Forgotten password</Button>
 
-      <HStack mb={5} alignItems="center">
-        <Divider flexShrink={1} />
-        <Text mx={5} color="grey">or</Text>
-        <Divider flexShrink={1} />
-      </HStack>
+      <OrDivider/>
 
       <GoogleAuthButton />
 

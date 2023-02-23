@@ -1,20 +1,31 @@
 import { Alert } from 'react-native';
 import { signOut } from 'firebase/auth';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Avatar, Button, Divider, useToast, Text } from "native-base";
 import Container from '../components/Container';
 import GoogleAuthButton from '../components/GoogleAuthButton';
 import Input from '../components/Input';
 import Colors from '../constants/Colors';
 import { useFirebase } from '../providers/FirebaseProvider';
+import OrDivider from '../components/OrDivider';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function AccountScreen() {
   const toast = useToast();
   const firebase = useFirebase()
 
+  const [name, setName] = useState("")
   const [curPass, setCurPass] = useState("")
   const [newPass, setNewPass] = useState("")
   const [verPass, setVerPass] = useState("")
+
+  const updateName = () => {
+    if (name.length > 3 && name.length < 32)
+      firebase.updateName(name)
+        .then(() => toast.show({ description: "Username successfuly updated!" }))
+        .catch((e) => toast.show({ description: e.code || e.message }))
+    else toast.show({ description: "Username must be between 3 and 32 character" })
+  }
 
   const updatePassword = () => {
     firebase.updatePassword(curPass, newPass, verPass)
@@ -26,6 +37,14 @@ export default function AccountScreen() {
       })
       .catch((e) => toast.show({ description: e.code || e.message }))
   }
+
+  useEffect(() => {
+    getDoc(doc(firebase.firestore, `users/${firebase.auth.currentUser?.uid}`))
+      .then((snapshotData) => {
+        if (snapshotData.exists())
+          setName(snapshotData.data().displayName);
+      })
+  }, [])
 
   const logout = () =>
     Alert.alert(
@@ -50,21 +69,25 @@ export default function AccountScreen() {
       }}>
         {firebase.auth.currentUser?.displayName}
       </Avatar>
-      <Text>{firebase.auth.currentUser?.displayName}</Text>
       <Text>{firebase.auth.currentUser?.email}</Text>
-
-      <Divider my={2} />
 
       <GoogleAuthButton />
 
       <Divider my={2} />
 
+      <Text w="100%">Username</Text>
+      <Input type="text" w="100%" value={name} onChangeText={setName} placeholder="Username" />
+      <Button w="100%" onPress={updateName}>Confirm</Button>
+
+      <Divider my={2} />
+
+      <Text w="100%">Password</Text>
       <Input type="password" w="100%" value={curPass} onChangeText={setCurPass} placeholder="Current password" />
       <Input type="password" w="100%" value={newPass} onChangeText={setNewPass} placeholder="New password" />
       <Input type="password" w="100%" value={verPass} onChangeText={setVerPass} placeholder="Confirm password" />
       <Button w="100%" onPress={updatePassword}>Confirm</Button>
 
-      <Divider my={2} />
+      <OrDivider />
 
       <Button w="100%" colorScheme="gray" onPress={logout}>Log out</Button>
     </Container>

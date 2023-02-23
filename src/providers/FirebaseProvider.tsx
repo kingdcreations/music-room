@@ -1,12 +1,17 @@
 import { createContext, useContext } from 'react';
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { getAuth, initializeAuth, signInWithEmailAndPassword, updatePassword as updatePasswordAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { doc, getFirestore, updateDoc } from "firebase/firestore";
 import { getDatabase, push, ref, set } from "firebase/database";
-import { getReactNativePersistence } from 'firebase/auth/react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FirebaseContextType } from '../types/FirebaseContextType';
 import { Track, User } from "../types/data";
+import {
+    getAuth,
+    initializeAuth,
+    getReactNativePersistence,
+    signInWithEmailAndPassword,
+    updatePassword as updatePasswordAuth
+} from 'firebase/auth/react-native';
 import {
     FIREBASE_API_KEY,
     FIREBASE_AUTH_DOMAIN,
@@ -45,6 +50,10 @@ export default function FirebaseProvider({ children }: { children: JSX.Element }
         persistence: getReactNativePersistence(AsyncStorage),
     });
 
+    const updateName = async (name: string) => {
+        updateDoc(doc(firestore, `users/${auth.currentUser?.uid}`), { displayName: name })
+    }
+
     const updatePassword = async (curPass: string, newPass: string, verPass = newPass) => {
         const user = auth.currentUser
 
@@ -72,6 +81,7 @@ export default function FirebaseProvider({ children }: { children: JSX.Element }
         database,
         firestore,
         auth,
+        updateName,
         updatePassword,
         addSongToPlaylist,
         addUserToRoom

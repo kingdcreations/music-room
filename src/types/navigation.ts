@@ -13,6 +13,7 @@ export type RootStackParamList = {
     Account: undefined;
     Login: undefined;
     Signin: undefined;
+    Verification: undefined;
     Recover: undefined;
 };
 
