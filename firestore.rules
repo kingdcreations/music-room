@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+        
+      allow read: if isSignedIn();
+      allow write: if uid == request.auth.uid
+      
+      match /email {
+      	allow write: if request.resource.data.email == request.auth.token.email
+      }
+      
+      match /displayName {
+      	allow write: if request.resource.data.displayName.size() > 3
+      		&& request.resource.data.displayName.size() < 32
+      }
+    }
+  }
+}
