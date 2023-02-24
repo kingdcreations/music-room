@@ -1,7 +1,7 @@
-import { Room, TrackData } from "./data";
+import { Room, Track } from "./data";
 
 export type AudioContextType = {
-    data: TrackData | null;
+    data: Track | null;
     room: Room | null;
     join: (room: Room) => (void);
     quit: () => (void);

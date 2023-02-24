@@ -7,6 +7,7 @@ export type Track = {
     author: string,
     thumbnailUrl: string,
     votes: {[key: string]: boolean}
+    startedAt?: number
 }
 
 export type TrackData = {

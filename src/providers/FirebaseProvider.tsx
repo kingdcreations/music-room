@@ -2,6 +2,7 @@ import { createContext, useContext } from 'react';
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { doc, getFirestore, updateDoc } from "firebase/firestore";
 import { getDatabase, push, ref, set } from "firebase/database";
+import { getStorage } from "firebase/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FirebaseContextType } from '../types/FirebaseContextType';
 import { Track, User } from "../types/data";
@@ -13,11 +14,12 @@ import {
     updatePassword as updatePasswordAuth
 } from 'firebase/auth/react-native';
 import {
+    FIREBASE_APP_ID,
     FIREBASE_API_KEY,
-    FIREBASE_AUTH_DOMAIN,
     FIREBASE_PROJECT_ID,
+    FIREBASE_AUTH_DOMAIN,
+    FIREBASE_STORAGE_BUCKET,
     FIREBASE_MESSAGING_SENDER_ID,
-    FIREBASE_APP_ID
 } from "@env"
 
 const FirebaseContext = createContext<FirebaseContextType>(null!)
@@ -36,14 +38,16 @@ export default function FirebaseProvider({ children }: { children: JSX.Element }
         apiKey: FIREBASE_API_KEY,
         projectId: FIREBASE_PROJECT_ID,
         authDomain: FIREBASE_AUTH_DOMAIN,
+        storageBucket: FIREBASE_STORAGE_BUCKET,
         messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
-        databaseURL: "music-room-81182-default-rtdb.europe-west1.firebasedatabase.app",
+        databaseURL: "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app"
     }
 
     const isAppInitialized = getApps().length
     const app = isAppInitialized ? getApp() : initializeApp(config);
 
     // Public 
+    const storage = getStorage(app);
     const database = getDatabase(app);
     const firestore = getFirestore(app);
     const auth = isAppInitialized ? getAuth() : initializeAuth(app, {
@@ -78,9 +82,10 @@ export default function FirebaseProvider({ children }: { children: JSX.Element }
     }
 
     const firebase = {
+        auth,
+        storage,
         database,
         firestore,
-        auth,
         updateName,
         updatePassword,
         addSongToPlaylist,

@@ -18,7 +18,7 @@ export default function AudioController({ data, room, quit }: AudioContextType) 
         >
             <AspectRatio bgColor={Colors.background} h="100%" ratio={1}>
                 {data ?
-                    <Image src={data.track.thumbnailUrl} alt="Song illustration" />
+                    <Image src={data.thumbnailUrl} alt="Song illustration" />
                     :
                     <View justifyContent='center' alignItems='center'>
                         <MaterialCommunityIcons name="sleep" size={20} color="white" />
@@ -26,8 +26,8 @@ export default function AudioController({ data, room, quit }: AudioContextType) 
             </AspectRatio>
 
             <VStack justifyContent="center" flexGrow={0} flexShrink={1}>
-                <Text fontSize={12} bold isTruncated>{data?.track.title || "Waiting for song..."}</Text>
-                {data?.track.author && <Text fontSize={12} isTruncated>{data?.track.author}</Text>}
+                <Text fontSize={12} bold isTruncated>{data?.title || "Waiting for song..."}</Text>
+                {data?.author && <Text fontSize={12} isTruncated>{data?.author}</Text>}
             </VStack>
 
             <IconButton onPress={quit} marginLeft="auto" size='40px' variant='none' _icon={{

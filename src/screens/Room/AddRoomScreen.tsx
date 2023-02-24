@@ -13,12 +13,14 @@ import { MapPressEvent } from 'react-native-maps/lib/MapView.types';
 import * as Location from 'expo-location';
 import { MapCircle } from 'react-native-maps/lib/MapCircle';
 import { useFirebase } from '../../providers/FirebaseProvider';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function AddRoomScreen({
   navigation
 }: HomeStackScreenProps<'AddRoom'>) {
   const firebase = useFirebase()
 
+  const [displayName, setDisplayName] = useState(firebase.auth.currentUser?.displayName)
   const [roomName, setRoomName] = useState(firebase.auth.currentUser?.displayName + "'s room")
   const [privateRoom, setPrivate] = useState(false)
   const [privateVoting, setPrivateVoting] = useState(false)
@@ -50,7 +52,7 @@ export default function AddRoomScreen({
       endTime: parseInt(endTime),
       owner: {
         uid: firebase.auth.currentUser?.uid,
-        displayName: firebase.auth.currentUser?.displayName,
+        displayName,
         photoURL: firebase.auth.currentUser?.photoURL
       },
       location: marker
@@ -59,6 +61,14 @@ export default function AddRoomScreen({
   }
 
   useEffect(() => {
+
+    getDoc(doc(firebase.firestore, `users/${firebase.auth.currentUser?.uid}`))
+    .then((snapshotData) => {
+      if (snapshotData.exists())
+        setDisplayName(snapshotData.data()?.displayName);
+        setRoomName(snapshotData.data()?.displayName + "'s room");
+    })
+    
     if (custom) (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') return;

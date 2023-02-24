@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { Room, TrackData } from '../types/data';
+import { Room, Track } from '../types/data';
 import AudioController from '../components/AudioController';
 import { Audio, InterruptionModeAndroid, InterruptionModeIOS } from 'expo-av';
-import { MUSIC_ROOM_API } from '@env'
 import { onValue, ref } from 'firebase/database';
 import { useFirebase } from './FirebaseProvider';
 import { AudioContextType } from '../types/AudioContextType';
+import { getDownloadURL, ref as storageRef } from 'firebase/storage';
 
 const AudioContext = createContext<AudioContextType>(null!)
 
@@ -23,7 +23,7 @@ export default function AudioProvider({ children }: { children: React.ReactNode 
     const [sound, setSound] = useState<Audio.Sound>(new Audio.Sound());
 
     // Public
-    const [data, setData] = useState<TrackData | null>(null)
+    const [data, setData] = useState<Track | null>(null)
     const [room, setRoom] = useState<Room | null>(null)
 
     const join = (room: Room) => setRoom(room)
@@ -49,40 +49,36 @@ export default function AudioProvider({ children }: { children: React.ReactNode 
         if (room) {
             const q = ref(firebase.database, `playlists/${room.id}/currentSong`)
             return onValue(q, (dataSnapshot) => {
-                if (dataSnapshot.exists()) {
-                    fetch(`http://${MUSIC_ROOM_API}:3000/room/${room.id}`)
-                        .then((res) => res.json())
-                        .then(({ currentSong, currentTime }) => {
-                            if (currentSong && currentTime) {
-                                setData({ track: currentSong, startTime: currentTime })
-                            }
-                        })
-                } else setData(null)
+                if (dataSnapshot.exists()) setData(dataSnapshot.val())
             })
         }
     }, [room])
 
     // Play current song if available
     useEffect(() => {
-        if (data) Audio.Sound.createAsync(
-            // Source
-            { uri: `http://${MUSIC_ROOM_API}:3000/song/${data.track.songId}` },
-            // Initialisation values
-            {
-                shouldPlay: true,
-                positionMillis: data.startTime,
-            },
-            // Events
-            (playbackStatus) => {
-                if (playbackStatus.isLoaded) {
-                    // Sound ended
-                    if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
-                        setData(null)
-                    }
-                }
+        if (!data) return
+
+        getDownloadURL(storageRef(firebase.storage, `${data.songId}.mp3`))
+            .then((uri) => {
+                Audio.Sound.createAsync(
+                    // Initialisation values
+                    { uri },
+                    {
+                        shouldPlay: true,
+                        positionMillis: Date.now() - (data.startedAt || 0),
+                    },
+                    // Events
+                    (playbackStatus) => {
+                        if (playbackStatus.isLoaded) {
+                            // Sound ended
+                            if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
+                                setData(null)
+                            }
+                        }
+                    })
+                    .then(({ sound: newSound }) => setSound(newSound))
+                    .catch(e => console.error(e))
             })
-            .then(({ sound: newSound }) => setSound(newSound))
-            .catch(e => console.error(e))
 
         // Unload sound
         return () => { sound?.unloadAsync() }

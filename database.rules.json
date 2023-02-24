@@ -41,6 +41,7 @@
             	&& root.child('rooms').child($roomID).child('users').child(auth.uid).val() === true) ||
           	(root.child('rooms').child($roomID).child('private').val() === false))",
           "queue": {
+            ".indexOn": ["vote"],
             "$songID": {
         			".write": "!data.exists() && root.child('rooms').child($roomID).exists() &&
             	(root.child('rooms').child($roomID).child('owner').child('uid').val() === auth.uid ||
