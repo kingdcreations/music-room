@@ -31,7 +31,7 @@ export default function SearchScreen() {
   }, [])
 
   return (
-    <Container>
+    <Container center>
       <Stack flexWrap='wrap' w="100%" justifyContent='center' direction='row'>
         {!loading ?
           rooms.map((room, i) => <PlaylistButton room={room} key={i} />)

@@ -32,10 +32,10 @@ export default function SigninScreen({
   }
 
   return (
-    <Container>
-      <Input onChangeText={setName} value={name} placeholder="Username" />
-      <Input onChangeText={setMail} value={mail} placeholder="Email address" />
-      <Input onChangeText={setPass} value={pass} type="password" placeholder="Password" />
+    <Container center>
+      <Input w="100%" onChangeText={setName} value={name} placeholder="Username" />
+      <Input w="100%" onChangeText={setMail} value={mail} placeholder="Email address" />
+      <Input w="100%" onChangeText={setPass} value={pass} type="password" placeholder="Password" />
       <Button w="100%" onPress={signin}>Sign in</Button>
       <Button w="100%" colorScheme='gray' onPress={() => navigation.goBack()}>Cancel</Button>
     </Container>

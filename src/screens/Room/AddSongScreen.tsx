@@ -45,6 +45,7 @@ export default function AddSongScreen({
     <Container>
       <Input
         mb={3}
+        w="100%"
         value={search}
         onChangeText={setSearch}
         InputRightElement={
@@ -59,7 +60,7 @@ export default function AddSongScreen({
 
       <VStack w="100%" alignItems='center' space='4'>
         {!isLoading && tracks ? tracks.map((track: any, i) => (
-          <TouchableOpacity key={i} onPress={() => addToPlaylist(track)}>
+          <TouchableOpacity style={{width: "100%"}} key={i} onPress={() => addToPlaylist(track)}>
             <HStack w="100%" space="4" alignItems='center'>
               <Image
                 size='sm'

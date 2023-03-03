@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
-import { User } from 'firebase/auth';
 import LoginScreen from '../screens/Auth/LoginScreen'
 import SigninScreen from '../screens/Auth/SigninScreen'
 import RecoverScreen from '../screens/Auth/RecoverScreen';
@@ -14,7 +13,10 @@ import HomeStack from './HomeStack';
 import colors from '../constants/Colors';
 import { useFirebase } from '../providers/FirebaseProvider';
 import VerificationScreen from '../screens/Auth/VerificationScreen';
-import { onAuthStateChanged } from 'firebase/auth/react-native';
+import { IconButton } from 'native-base';
+import { MaterialIcons } from '@expo/vector-icons';
+import { signOut } from 'firebase/auth';
+import { Alert } from 'react-native';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const RootStack = createBottomTabNavigator<RootStackParamList>();
@@ -22,16 +24,28 @@ const RootStack = createBottomTabNavigator<RootStackParamList>();
 export default function Navigation() {
     const firebase = useFirebase()
 
-    const [user, setUser] = useState<User | null>(null);
-
-    useEffect(() => onAuthStateChanged(firebase.auth, (u) => setUser(u)), []);
+    const logout = () =>
+      Alert.alert(
+        "Confirmation",
+        "Log out ?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel"
+          },
+          {
+            text: "Logout",
+            onPress: () => signOut(firebase.auth)
+          }
+        ]
+      );
 
     const theme = {
         dark: true,
         colors
     };
 
-    if (user && user.emailVerified) return (
+    if (firebase.user && firebase.user.emailVerified) return (
         <NavigationContainer theme={theme}>
             <RootStack.Navigator
                 initialRouteName="HomeRoot"
@@ -62,11 +76,20 @@ export default function Navigation() {
                         headerShown: false,
                         title: 'Home',
                     }} />
-                <RootStack.Screen name="Account" component={AccountScreen} />
+                <RootStack.Screen name="Account" component={AccountScreen} options={{
+                    headerRight: () => (
+                        <IconButton mr={2} onPress={logout} colorScheme="error" variant="link" _icon={{
+                            as: MaterialIcons,
+                            size: '5',
+                            name: "logout",
+                        }} />
+                    ),
+                }}
+                />
             </RootStack.Navigator>
         </NavigationContainer>
     )
-    else if (user) return (
+    else if (firebase.user) return (
         <NavigationContainer theme={theme}>
             <Stack.Navigator screenOptions={{ animation: 'slide_from_right' }}>
                 <Stack.Screen name="Verification" component={VerificationScreen} />

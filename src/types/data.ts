@@ -27,6 +27,11 @@ export type Join = {
     user: User,
 }
 
+export type Device = {
+    deviceName?: string,
+    os: string,
+}
+
 export type Room = {
     id: string;
     name: string;

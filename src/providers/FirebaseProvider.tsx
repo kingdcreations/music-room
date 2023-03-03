@@ -1,14 +1,16 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { getApp, getApps, initializeApp } from "firebase/app";
 import { doc, getFirestore, updateDoc } from "firebase/firestore";
-import { getDatabase, push, ref, set } from "firebase/database";
+import { getDatabase, onDisconnect, onValue, push, ref, remove, set } from "firebase/database";
 import { getStorage } from "firebase/storage";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FirebaseContextType } from '../types/FirebaseContextType';
 import { Track, User } from "../types/data";
 import {
+    User as UserAuth,
     getAuth,
     initializeAuth,
+    onAuthStateChanged,
     getReactNativePersistence,
     signInWithEmailAndPassword,
     updatePassword as updatePasswordAuth
@@ -21,6 +23,10 @@ import {
     FIREBASE_STORAGE_BUCKET,
     FIREBASE_MESSAGING_SENDER_ID,
 } from "@env"
+import { androidId } from 'expo-application';
+import { Platform } from 'react-native';
+import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 
 const FirebaseContext = createContext<FirebaseContextType>(null!)
 
@@ -54,6 +60,16 @@ export default function FirebaseProvider({ children }: { children: JSX.Element }
         persistence: getReactNativePersistence(AsyncStorage),
     });
 
+    const getDeviceId = async () => {
+        if (Platform.OS === "android")
+            return androidId;
+        else if (Platform.OS === "ios")
+            return await Application.getIosIdForVendorAsync();
+    }
+
+    const [user, setUser] = useState<UserAuth | null>(null);
+    useEffect(() => onAuthStateChanged(firebase.auth, (u) => setUser(u)), []);
+
     const updateName = async (name: string) => {
         updateDoc(doc(firestore, `users/${auth.currentUser?.uid}`), { displayName: name })
     }
@@ -81,8 +97,25 @@ export default function FirebaseProvider({ children }: { children: JSX.Element }
         await set(userRef, true)
     }
 
+
+    // Device listing
+    const connectedRef = ref(database, '.info/connected');
+    useEffect(() => {
+        return onValue(connectedRef, async (snap) => {
+            if (snap.val() === true && user) {
+                const con = ref(database, `devices/${user.uid}/connections/${await getDeviceId()}`);
+                await set(con, {
+                    os: Platform.OS,
+                    deviceName: Device.deviceName
+                });
+                await onDisconnect(con).remove();
+            }
+        });
+    }, [user])
+
     const firebase = {
         auth,
+        user,
         storage,
         database,
         firestore,

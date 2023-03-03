@@ -1,3 +1,4 @@
+import { StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
 import { AspectRatio, Avatar, Button, Divider, VStack, HStack, IconButton, Text, View, Image, Box } from 'native-base';
 import Container from '../../components/Container';
@@ -8,6 +9,10 @@ import { onValue, ref, query } from 'firebase/database';
 import { useAudio } from '../../providers/AudioProvider';
 import Colors from '../../constants/Colors';
 import { MaterialIcons, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import MapView from 'react-native-maps/lib/MapView';
+import { PROVIDER_GOOGLE } from 'react-native-maps';
+import { MapMarker } from 'react-native-maps/lib/MapMarker';
+import { MapCircle } from 'react-native-maps/lib/MapCircle';
 import * as Location from 'expo-location';
 import { LocationObjectCoords } from 'expo-location';
 import { getDistance } from 'geolib';
@@ -97,7 +102,7 @@ export default function RoomScreen({
   return (
     <Container>
       {/* Playlist info */}
-      <AspectRatio minW="50%" w="50%" bgColor={Colors.card} borderWidth={1} borderColor={Colors.border} ratio={1}>
+      <AspectRatio w="50%" bgColor={Colors.card} borderWidth={1} borderColor={Colors.border} ratio={1}>
         {currentSong ? <Image
           src={currentSong.thumbnailUrl}
           alt="Current song's thumbnail" />
@@ -126,6 +131,35 @@ export default function RoomScreen({
         <Text my={2} color="grey">You can only add songs if you have been invited to</Text>
       </HStack>}
 
+      {!room.privateVoting && room.custom &&
+        <>
+          {!isInTimeRange() && <HStack alignItems="center" space={3}>
+            <MaterialCommunityIcons name="calendar-clock" size={25} color="grey" />
+            <Text my={2} color="grey">You can only vote between <Text bold color="white">{room.startTime}</Text> and <Text bold color="white">{room.endTime}</Text> hours</Text>
+          </HStack>}
+
+          <Box h={200} w="100%">
+            <MapView
+              showsUserLocation
+              style={styles.map}
+              provider={PROVIDER_GOOGLE}
+              region={{
+                ...room.location,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              }}
+              focusable
+            >
+              {room.location && <MapMarker coordinate={room.location} />}
+              {room.location && <MapCircle center={room.location} strokeColor="#ff0000ff" radius={1000} fillColor="#ff000050" />}
+            </MapView>
+          </Box>
+
+          {!isInRadius() && <Text my={2} textAlign="center" color="grey">
+            You must be in the specific area radius to vote
+          </Text>}
+        </>}
+
       {/* Controls */}
       <Divider />
 
@@ -141,6 +175,11 @@ export default function RoomScreen({
             size: '5',
             name: "person-add-alt-1"
           }} />}
+          {/* {isOwner() && room.private && <IconButton variant="link" _icon={{
+                as: MaterialCommunityIcons,
+                size: '5',
+                name: "trash-can"
+              }} />} */}
         </HStack>
 
         {audio.room?.id === room.id ?
@@ -165,3 +204,10 @@ export default function RoomScreen({
     </Container>
   );
 }
+
+const styles = StyleSheet.create({
+  map: {
+    width: '100%',
+    height: '100%',
+  },
+});
