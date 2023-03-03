@@ -9,6 +9,7 @@ import Colors from '../constants/Colors';
 import { useFirebase } from '../providers/FirebaseProvider';
 import OrDivider from '../components/OrDivider';
 import { doc, getDoc } from 'firebase/firestore';
+import * as Clipboard from 'expo-clipboard';
 
 export default function AccountScreen() {
   const toast = useToast();
@@ -36,6 +37,16 @@ export default function AccountScreen() {
         toast.show({ description: "Password successfuly updated!" })
       })
       .catch((e) => toast.show({ description: e.code || e.message }))
+  }
+
+  const genApiToken = () => {
+    firebase.auth.currentUser?.getIdToken().then((ApiToken) => {
+      Clipboard.setStringAsync(ApiToken).then(() => {
+        toast.show({ description: "Your API token has been successfully copied to your Clipboard ! " })
+      })
+      .catch((e) => toast.show({ description: "Error while setting Clipboard paste." }))
+    })
+    .catch((e) => toast.show({ description: "Error while fetching Your Api Token." }))
   }
 
   useEffect(() => {
@@ -88,7 +99,8 @@ export default function AccountScreen() {
       <Button w="100%" onPress={updatePassword}>Confirm</Button>
 
       <OrDivider />
-
+      
+      <Button w="100%" onPress={genApiToken}>Click to copy API Token to your Clipboard</Button>
       <Button w="100%" colorScheme="gray" onPress={logout}>Log out</Button>
     </Container>
   );
