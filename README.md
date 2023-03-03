@@ -16,26 +16,6 @@ To obtain an authentication token, developers must use the Firebase Authenticati
 https://firebase.google.com/docs/firestore/use-rest-api?hl=fr
 
 # Endpoints
-/room/{roomId}
-This endpoint allows developers to retrieve data from their room.
-
-GET /room/{roomId}
-Returns information about the room.
-
-/playlists
-This endpoint allows developers to retrieve playlists.
-
-GET /playlists
-Returns a list of playlists.
-
-/playlists/{playlistId}
-This endpoint allows developers to retrieve data from a specific playlist, with sorting based on votes.
-
-GET /playlists/{playlistId}?sortBy=votes&sortOrder=asc
-Returns information about the specified playlist, sorted by votes in ascending order.
-
-
-
 ## Rooms
 ### Read
 This endpoint is used to read rooms from the database. It requires a valid authentication token (auth.uid) to be present in the request header.
