@@ -18,44 +18,57 @@ export type Track = {
 
 admin.initializeApp();
 
+const sortSongs = (a: Track, b: Track) => {
+  if ((a.votes ? Object.keys(a.votes).length : 0) < (b.votes ? Object.keys(b.votes).length : 0)) {
+    return 1;
+  } else if ((a.votes ? Object.keys(a.votes).length : 0) > (b.votes ? Object.keys(b.votes).length : 0)) {
+    return -1;
+  }
+  return 0;
+};
+
 const loadNextSong = async (roomKey: string) => {
-  logger.info("Imma load the next song brother");
+  logger.info("Loading next song...");
   const currentSongRef = admin.database().ref(`/playlists/${roomKey}/currentSong`);
   const queueSongRef = admin.database().ref(`/playlists/${roomKey}/queue`);
   const currentSong = (await currentSongRef.get()).val();
-  let nextSong: Array<string | Track> = [];
 
-  // Find the most voted song in the DB
-  await queueSongRef.orderByChild("vote").limitToLast(1).get()
-    .then((snapshot) => {
-      const data = snapshot.val();
-      if (snapshot.exists()) {
-        nextSong = [Object.entries<Track>(data)[0][0],
-          Object.entries<Track>(data)[0][1]];
-      }
+  // Find the most voted song in the queue
+  const queueSnapshot = await queueSongRef.get();
+
+  // Check if there is a next song
+  if (!queueSnapshot.exists()) {
+    logger.info("No song to play next yet");
+    return;
+  }
+
+  // Parse queue data by adding key to Track object
+  const queue = Object.entries<Track>(queueSnapshot.val())
+    .map((item) => {
+      item[1].key = item[0];
+      return item[1];
     });
 
-  logger.info(`Song ${nextSong} has been loaded`);
+  // Sort data to get the most voted at top
+  const nextSong = queue.length === 1 ? queue[0] : queue.sort(sortSongs)[0];
 
   // If there is no current song and a next song is available
-  if (!currentSong && nextSong.length === 2) {
-    logger.info("No current song available but a nextSong is here");
-    const nextSongKey = nextSong[0] as string;
-    const nextSongData = nextSong[1] as Track;
+  if (!currentSong && nextSong && nextSong.key) {
+    logger.info(`${nextSong.title} has been loaded`);
 
     // Remove the next song from the queue
     await admin.database()
-      .ref(`/playlists/${roomKey}/queue/${nextSongKey}`).remove();
+      .ref(`/playlists/${roomKey}/queue/${nextSong.key}`).remove();
 
-    logger.info(`NextSong ${nextSongData.title} has been removed from ${roomKey} queue `);
+    logger.info(`NextSong ${nextSong.title} has been removed from ${roomKey} queue`);
 
     // Get song duration and launch function at the end
-    const song = await ytdl.getBasicInfo(`https://www.youtube.com/watch?v=${nextSongData?.songId}`);
+    const song = await ytdl.getBasicInfo(`https://www.youtube.com/watch?v=${nextSong.songId}`);
     const duration = parseInt(song.player_response.videoDetails.lengthSeconds);
 
     // Save current song data
-    nextSongData.startedAt = Date.now();
-    await currentSongRef.set(nextSongData);
+    nextSong.startedAt = Date.now();
+    await currentSongRef.set(nextSong);
 
     // Clean currentSong at song end
     const queue = getFunctions().taskQueue("locations/europe-west3/functions/onSongEnd");
@@ -63,7 +76,7 @@ const loadNextSong = async (roomKey: string) => {
       {roomKey},
       {scheduleDelaySeconds: duration},
     );
-    logger.info(`Listening to ${nextSongData.title} (from next)`);
+    logger.info(`Listening to ${nextSong.title} (from next)`);
   }
 };
 

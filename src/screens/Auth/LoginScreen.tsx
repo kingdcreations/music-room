@@ -33,17 +33,17 @@ export default function LoginScreen({
   const recover = () => navigation.navigate('Recover')
 
   return (
-    <Container>
-      <Input onChangeText={setMail} value={mail} placeholder="Email address" />
-      <Input onChangeText={setPass} value={pass} type="password" placeholder="Password" />
+    <Container center>
+      <Input w="100%" onChangeText={setMail} value={mail} placeholder="Email address" />
+      <Input w="100%" onChangeText={setPass} value={pass} type="password" placeholder="Password" />
       <Button w="100%" onPress={login}>Login</Button>
       <Button variant="link" onPress={recover}>Forgotten password</Button>
 
-      <OrDivider/>
+      <OrDivider />
 
       <GoogleAuthButton />
 
-      <HStack mt={5} alignItems="center">
+      <HStack w="auto" mt={3} alignItems="center">
         <Text>No account yet?</Text>
         <Button variant="link" onPress={signin}>Create now</Button>
       </HStack>

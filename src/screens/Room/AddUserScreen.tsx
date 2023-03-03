@@ -46,6 +46,7 @@ export default function AddUserScreen({
     <Container>
       <Input
         mb={3}
+        w="100%"
         value={search}
         onChangeText={setSearch}
         InputRightElement={

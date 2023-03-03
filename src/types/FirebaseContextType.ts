@@ -1,4 +1,4 @@
-import { Auth } from "firebase/auth/react-native";
+import { User as UserAuth, Auth } from "firebase/auth/react-native";
 import { Database } from "firebase/database";
 import { Firestore } from "firebase/firestore";
 import { FirebaseStorage } from "firebase/storage";
@@ -6,6 +6,7 @@ import { Track, User } from "./data";
 
 export type FirebaseContextType = {
     auth: Auth;
+    user: UserAuth | null,
     database: Database;
     firestore: Firestore;
     storage: FirebaseStorage;

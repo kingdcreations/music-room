@@ -13,14 +13,14 @@ export default function Container(props: any) {
                     justifyContent='center'
                     alignItems='center'
                     maxWidth='750px'
-
                 >
                     {props.header}
                 </VStack>}
             {/* Body */}
-            <ScrollView w='100%' contentContainerStyle={{
-                paddingBottom: 50
-            }}>
+            <ScrollView w='100%' maxW={500} contentContainerStyle={[{
+                paddingBottom: 50,
+                justifyContent: 'center'
+            }, props.center && {flexGrow: 1}]}>
                 <VStack
                     p={5}
                     space={2.5}

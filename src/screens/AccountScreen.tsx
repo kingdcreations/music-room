@@ -1,5 +1,3 @@
-import { Alert } from 'react-native';
-import { signOut } from 'firebase/auth';
 import { useState, useEffect } from 'react';
 import { Avatar, Button, Divider, useToast, Text } from "native-base";
 import Container from '../components/Container';
@@ -7,8 +5,9 @@ import GoogleAuthButton from '../components/GoogleAuthButton';
 import Input from '../components/Input';
 import Colors from '../constants/Colors';
 import { useFirebase } from '../providers/FirebaseProvider';
-import OrDivider from '../components/OrDivider';
 import { doc, getDoc } from 'firebase/firestore';
+import OrDivider from '../components/OrDivider';
+import Devices from '../components/Devices';
 
 export default function AccountScreen() {
   const toast = useToast();
@@ -46,24 +45,8 @@ export default function AccountScreen() {
       })
   }, [])
 
-  const logout = () =>
-    Alert.alert(
-      "Confirmation",
-      "Log out ?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel"
-        },
-        {
-          text: "Logout",
-          onPress: () => signOut(firebase.auth)
-        }
-      ]
-    );
-
   return (
-    <Container>
+    <Container center>
       <Avatar bg={Colors.primary} size="xl" source={{
         uri: firebase.auth.currentUser?.photoURL || undefined
       }}>
@@ -71,25 +54,23 @@ export default function AccountScreen() {
       </Avatar>
       <Text>{firebase.auth.currentUser?.email}</Text>
 
-      <GoogleAuthButton />
-
-      <Divider my={2} />
-
-      <Text w="100%">Username</Text>
+      <Text bold w="100%">Username</Text>
       <Input type="text" w="100%" value={name} onChangeText={setName} placeholder="Username" />
       <Button w="100%" onPress={updateName}>Confirm</Button>
 
-      <Divider my={2} />
+      <Divider my={3} />
 
-      <Text w="100%">Password</Text>
+      <Text bold w="100%">Password</Text>
       <Input type="password" w="100%" value={curPass} onChangeText={setCurPass} placeholder="Current password" />
       <Input type="password" w="100%" value={newPass} onChangeText={setNewPass} placeholder="New password" />
       <Input type="password" w="100%" value={verPass} onChangeText={setVerPass} placeholder="Confirm password" />
       <Button w="100%" onPress={updatePassword}>Confirm</Button>
 
+      <Devices />
+
       <OrDivider />
 
-      <Button w="100%" colorScheme="gray" onPress={logout}>Log out</Button>
+      <GoogleAuthButton />
     </Container>
   );
 }

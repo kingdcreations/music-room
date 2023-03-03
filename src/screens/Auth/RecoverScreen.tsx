@@ -20,8 +20,8 @@ export default function Recover({
   }
 
   return (
-    <Container>
-      <Input onChangeText={setMail} value={mail} placeholder="Email address" />
+    <Container center>
+      <Input w="100%" onChangeText={setMail} value={mail} placeholder="Email address" />
       <Button w="100%" onPress={recover}>Recover</Button>
       <Button w="100%" colorScheme='gray' onPress={() => navigation.goBack()}>Cancel</Button>
     </Container>

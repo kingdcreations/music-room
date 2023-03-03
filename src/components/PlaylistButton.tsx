@@ -36,6 +36,7 @@ export default function PlaylistButton({ room }: { room: Room }) {
                 </VStack>
                 <AspectRatio
                     w="100%"
+                    minW="100%"
                     borderWidth={1}
                     borderColor={Colors.border}
                     bgColor={Colors.card}

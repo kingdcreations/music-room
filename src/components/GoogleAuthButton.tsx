@@ -6,6 +6,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { FIREBASE_CLIENT_ID } from '@env';
 import { doc, setDoc } from 'firebase/firestore';
 import { useFirebase } from '../providers/FirebaseProvider';
+import * as WebBrowser from "expo-web-browser";
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleAuthButton() {
     const firebase = useFirebase()

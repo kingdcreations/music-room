@@ -1,5 +1,11 @@
 {
   "rules": {
+			"devices": {
+				"$uid": {
+					".write": "auth.uid === $uid",
+					".read": "auth.uid === $uid",
+        }
+			},
       "rooms": {
         ".read": "auth.uid !== null &&
         	((query.orderByChild === 'private' &&
@@ -8,7 +14,7 @@
            	query.equalTo === auth.uid))",
 	      ".indexOn": ["owner/uid", "private"],
         "$roomID": {
-          ".read": "data.child('users').child(auth.uid).val() === true",
+          ".read": "data.child('users').child(auth.uid).val() === true || data.child('owner').child('uid').val() === auth.uid",
         	".write": "auth.uid !== null && !data.exists()",
           ".validate": "newData.hasChildren(['name', 'owner', 'private'])",
           "owner": {
@@ -41,7 +47,6 @@
             	&& root.child('rooms').child($roomID).child('users').child(auth.uid).val() === true) ||
           	(root.child('rooms').child($roomID).child('private').val() === false))",
           "queue": {
-            ".indexOn": ["vote"],
             "$songID": {
         			".write": "!data.exists() && root.child('rooms').child($roomID).exists() &&
             	(root.child('rooms').child($roomID).child('owner').child('uid').val() === auth.uid ||
