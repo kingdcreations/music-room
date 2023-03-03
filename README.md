@@ -36,6 +36,63 @@ Returns information about the specified playlist, sorted by votes in ascending o
 
 
 
+## Rooms
+### Read
+This endpoint is used to read rooms from the database. It requires a valid authentication token (auth.uid) to be present in the request header.
+
+The query.orderByChild parameter is used to sort the results by a specific child node. The query.equalTo parameter is used to filter the results by a specific value.
+
+#### The following rules are applied:
+The private child node must be set to false.
+The owner/uid child node must be set to the authenticated user's uid.
+
+#### Firebase security rules:
+```
+auth.uid !== null && ((query.orderByChild === 'private' && query.equalTo === false) ||
+(query.orderByChild === 'owner/uid' && query.equalTo === auth.uid))
+```
+
+#### Curl requests:
+#### Request only Public rooms
+```
+curl "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/rooms.json?orderByChild=private&equalTo=false&auth=<ACCESS_TOKEN>"
+```
+#### Request only user rooms (owner)
+```
+curl "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/rooms.json?orderByChild=owner/uid&equalTo=<UID>&auth=<ACCESS_TOKEN>"
+```
+
+### WRITE
+This endpoint is used to create a new room in the database. It requires a valid authentication token (auth.uid) to be present in the request header. 
+
+#### The following rules are applied:
+The authenticated user must exist (auth.uid !== null).
+The room must not already exist (!data.exists()).
+The new data must have the name, owner, and private child nodes.
+The owner/uid child node must be set to the authenticated user's uid.
+
+
+##### Additional Info:
+Using this endpoints will automaticaly generate the IDROOM.
+
+#### Firebase security rules:
+```
+auth.uid !== null && !data.exists()
+newData.hasChildren(['name', 'owner', 'private'])
+  newData.hasChild('uid')
+    newData.isString() && newData.val() === auth.uid
+```
+
+#### Curl requests:
+```
+curl -X POST -d '{"name": "<ROOM_NAME>", "owner": {"uid": "<UID>"}, "private": <BOOLEAN>}' "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/rooms.json?auth=<ACCESS_TOKEN>"
+```
+
+
+
+
+
+
 
 /////////////////
 
@@ -50,11 +107,6 @@ ROOMS
 ROOMS/{$IDROOM}
 -> READ:
 data.child('users').child(auth.uid).val() === true || data.child('owner').child('uid').val() === auth.uid
--> WRITE: 
-auth.uid !== null && !data.exists()
-WHEN DATA = newData.hasChildren(['name', 'owner', 'private'])
-WHEN OWNER = newData.hasChild('uid')
-WHEN UID = newData.isString() && newData.val() === auth.uid
 
 ROOMS/{$IDROOM}/users
 -> WRITE:
@@ -104,8 +156,4 @@ root.child('rooms').child($roomID).child('owner').child('uid').val() === auth.ui
                   (root.child('rooms').child($roomID).child('private').val() === false
                     && root.child('rooms').child($roomID).child('privateVoting').val() === true
                     && root.child('rooms').child($roomID).child('users').child(auth.uid).val() === true)
-
-
-
-curl -X PUT -d '{"COUCOU":"MDR"}' 'https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/playlists/-NPX5J6veGnPMlyN7Fub.json?auth=eyJhbGciOiJSUzI1NiIsImtpZCI6ImY4NzZiNzIxNDAwYmZhZmEyOWQ0MTFmZTYwODE2YmRhZWMyM2IzODIiLCJ0eXAiOiJKV1QifQ.eyJuYW1lIjoiVGVzdCIsInBpY3R1cmUiOiJodHRwczovL2xoMy5nb29nbGV1c2VyY29udGVudC5jb20vYS9BRWRGVHA2ZFl1NG8xLVNyT05hOWNMNUZfa2Nsek9FaXJJQ1YwS1B4SUhMRD1zOTYtYyIsImlzcyI6Imh0dHBzOi8vc2VjdXJldG9rZW4uZ29vZ2xlLmNvbS9tdXNpYy1yb29tLTgxMTgyIiwiYXVkIjoibXVzaWMtcm9vbS04MTE4MiIsImF1dGhfdGltZSI6MTY3NzE2NTg3MSwidXNlcl9pZCI6IlhxZTNHUjZrb0lhWnMxTTMybGRoRnUxeDdtTzIiLCJzdWIiOiJYcWUzR1I2a29JYVpzMU0zMmxkaEZ1MXg3bU8yIiwiaWF0IjoxNjc3NzcwMDczLCJleHAiOjE2Nzc3NzM2NzMsImVtYWlsIjoibGFpZ25lbGV0aGFuQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7Imdvb2dsZS5jb20iOlsiMTE4Mjk2MTg5ODIyNDMxNzY3NjgwIl0sImVtYWlsIjpbImxhaWduZWxldGhhbkBnbWFpbC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJnb29nbGUuY29tIn19.VApxYOd_Kr8ckGldwDhieQZRvuXM7_L9LlRP319I789RkSvvDHo8I_sAZM3cYn-aITRTs3cLdthgSeKbkfIr5Pl35PY1dDtkaXyGGxb9lC8IvfxV08ScvSZbZMtRimlwfjiXrnP3pFHNRJUFvDdBDM7cYnlPkyDiDMC_9TCI-wH2xXCoIhNGE044BPNSS_jlNG9JUqQaEj3D0O7ZKWTs_pVQ4nKvJgdP6QjJiJXPlhyFLCMoZruTQcYySAt16kxubCkHdVrhvQgva9QgSnGYhLUHwTQmmyNVEIJCAAPmrtAeUvRX4Og3E8QwUaV8UPnobqdsfUl9G_aWY2KPQYiNYg'
 
