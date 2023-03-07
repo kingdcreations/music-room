@@ -209,16 +209,3 @@ The room is private for edition and the user is a member of the room.
 curl -X POST -d '{"author": "<AUTHOR>", "songID": "<SONG_ID>", "title": "<TITLE>", "thumbnailUrl": "<THUMBNAILURL>"}' "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/PLAYLISTS/<ROOM_ID>/queue/<SONG_ID>.json?auth=<ACCESS_TOKEN>"
 ```
 
-////////
-
-PLAYLISTS/{$IDROOM}/queue/{$SONGID}/votes
---> WRITE:
-root.child('rooms').child($roomID).child('owner').child('uid').val() === auth.uid ||
-                	(root.child('rooms').child($roomID).child('private').val() === true
-                  	&& root.child('rooms').child($roomID).child('users').child(auth.uid).val() === true) ||
-                  (root.child('rooms').child($roomID).child('private').val() === false
-                  	&& root.child('rooms').child($roomID).child('privateVoting').val() === false) ||
-                  (root.child('rooms').child($roomID).child('private').val() === false
-                    && root.child('rooms').child($roomID).child('privateVoting').val() === true
-                    && root.child('rooms').child($roomID).child('users').child(auth.uid).val() === true)
-
