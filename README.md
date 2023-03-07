@@ -85,62 +85,131 @@ data.child('users').child(auth.uid).val() === true || data.child('owner').child(
 curl "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/rooms/<IDROOM>.json?auth=<ACCESS_TOKEN>"
 ```
 
+## Rooms/{$IDROOM}/users
+### Write
+This endpoint is used to add or remove users from a room in the database. It requires a valid authentication token (auth.uid) to be present in the request header.
 
+#### The following rules are applied:
+The authenticated user must be the owner of the room.
 
-
-
-
-/////////////////
-
-RTDB
-
-ROOMS
--> READ: 
-"auth.uid !== null && ((query.orderByChild === 'private' && query.equalTo === false) ||
-                (query.orderByChild ===   'owner/uid' && query.equalTo === auth.uid))"
--> WRITE: Follow ROOMS/{$IDROOM} to write inside. ( Tips: use this to auto generate IDROOM, POST REQUEST)
-
-ROOMS/{$IDROOM}
--> READ:
-data.child('users').child(auth.uid).val() === true || data.child('owner').child('uid').val() === auth.uid
-
-ROOMS/{$IDROOM}/users
--> WRITE:
+#### Firebase security rules:
+```
 auth.uid === data.parent().child('owner/uid').val()
+```
 
------------------------
+#### Example:
+```
+curl -X PUT -d '{"<UID>": true, "<UID>": false, "<UID>": true, ... }' \
+    "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/rooms/<IDROOM>/users.json?auth=<ACCESS_TOKEN>"
+```
 
-JOINS
---> READ:
+
+## Joins
+This document has data of users for a specific room.
+
+### Read
+This endpoint is used to read childrens of /Joins. It requires a valid authentication token (auth.uid) to be present in the request header.
+
+#### The following rules are applied:
+This rule checks if the authenticated user is either the owner of the room or the user associated with the join. It allows the read operation if either of the following conditions is met:
+
+The query orderByChild is "user/uid" and the equalTo value is equal to the authenticated user's UID.
+The query orderByChild is "roomID" and the equalTo value is equal to the ID of a room where the authenticated user is the owner.
+
+#### Firebase security rules:
+```
 auth.uid !== null &&
-        	(query.orderByChild === 'user/uid' && query.equalTo === auth.uid) ||
-        	(query.orderByChild === 'roomID' && root.child('rooms').child(query.equalTo).child('owner/uid').val() === auth.uid)"
---> WRITE:
+  (query.orderByChild === 'user/uid' && query.equalTo === auth.uid) ||
+  (query.orderByChild === 'roomID' && root.child('rooms').child(query.equalTo).child('owner/uid').val() === auth.uid)
+```
+
+#### Example:
+```
+curl "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/joins.json?auth=<ACCESS_TOKEN>&orderByChild=<ORDER_BY_CHILD>&equalTo=<EQUAL_TO>"
+```
+Please replace <ORDER_BY_CHILD>, and <EQUAL_TO> with their actual values.
+
+## Joins/{$joinID}
+### Write
+This endpoint is used to add a new child in join for a user in the database. It requires a valid authentication token (auth.uid) to be present in the request header.
+
+#### The following rules are applied:
+This rule checks if the authenticated user is the owner of the room where the child join is being added. It allows the write operation if the following conditions are met:
+
+The new Data has a child named 'user' and 'roomID'
+The authenticated user is not null.
+The child join does not already exist in the database.
+The authenticated user is the owner of the room associated with the join.
+
+#### Firebase security rules:
+```
 auth.uid !== null && !data.exists() &&
-          	root.child('rooms').child(newData.child('roomID').val()).child('owner/uid').val() === auth.uid
-WHEN DATA = newData.hasChildren(['user', 'roomID'])
+  root.child('rooms').child(newData.child('roomID').val()).child('owner/uid').val() === auth.uid
+newData.hasChildren(['user', 'roomID'])
+```
 
--------------------------
+#### Example:
+```
+curl -X POST -d '{"user": {"uid": "<UID>"}, "roomID": "<ROOM_ID>"}' \
+  "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/joins.json?auth=<ACCESS_TOKEN>"
+```
 
-PLAYLISTS/{$IDROOM}
---> READ:
-root.child('rooms').child($roomID).exists() &&
-          (root.child('rooms').child($roomID).child('owner').child('uid').val() === auth.uid ||
-          	(root.child('rooms').child($roomID).child('private').val() === true
-            	&& root.child('rooms').child($roomID).child('users').child(auth.uid).val() === true) ||
-          	(root.child('rooms').child($roomID).child('private').val() === false))
+## Playlists/{$IDROOM}
+### Read
+This endpoint is used to read the playlists associated with a specific room from the database. It requires a valid authentication token (auth.uid) to be present in the request header.
 
-PLAYLISTS/{$IDROOM}/queue/{$SONGID}
---> WRITE:
+#### The following rules are applied:
+The room must exist in the database.
+The authenticated user must either be the owner of the room, or:
+The room is private and the authenticated user is added to the room's user list.
+The room is public.
+
+#### Firebase security rules:
+```
+root.child('rooms').child($roomID).exists() && (
+  root.child('rooms').child($roomID).child('owner').child('uid').val() === auth.uid ||
+  (root.child('rooms').child($roomID).child('private').val() === true &&
+   root.child('rooms').child($roomID).child('users').child(auth.uid).val() === true) ||
+  (root.child('rooms').child($roomID).child('private').val() === false)
+)
+```
+
+#### Example:
+```
+curl "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/playlists/<IDROOM>.json?auth=<ACCESS_TOKEN>"
+```
+
+## Playlists/{$IDROOM}/queue/{$SONGID}
+### Write
+This endpoint is used to add a song to the queue of a specific room in the database. It requires a valid authentication token (auth.uid) to be present in the request header.
+
+#### The following rules are applied:
+The song can only be added to the queue if the authenticated user is authorized to access the room according to the following criteria:
+
+The user is the owner of the room.
+The room is private and the user is a member of the room.
+The room is public.
+The room is not private for edition and not private, which allows anyone to add songs to the queue.
+The room is private for edition and the user is a member of the room.
+
+#### Firebase security rules:
+```
 !data.exists() && root.child('rooms').child($roomID).exists() &&
-            	(root.child('rooms').child($roomID).child('owner').child('uid').val() === auth.uid ||
-          			(root.child('rooms').child($roomID).child('private').val() === true
-             			&& root.child('rooms').child($roomID).child('users').child(auth.uid).val() === true) ||
-            		(root.child('rooms').child($roomID).child('private').val() === false
-             			&& root.child('rooms').child($roomID).child('privateEdition').val() === false) ||
-            		(root.child('rooms').child($roomID).child('private').val() === false
-             			&& root.child('rooms').child($roomID).child('privateEdition').val() === true
-             			&& root.child('rooms').child($roomID).child('users').child(auth.uid).val() === true))
+    (root.child('rooms').child($roomID).child('owner').child('uid').val() === auth.uid ||
+        (root.child('rooms').child($roomID).child('private').val() === true
+            && root.child('rooms').child($roomID).child('users').child(auth.uid).val() === true) ||
+        (root.child('rooms').child($roomID).child('private').val() === false
+            && root.child('rooms').child($roomID).child('privateEdition').val() === false) ||
+        (root.child('rooms').child($roomID).child('private').val() === false
+            && root.child('rooms').child($roomID).child('privateEdition').val() === true
+            && root.child('rooms').child($roomID).child('users').child(auth.uid).val() === true))
+```
+#### Example:
+```
+curl -X POST -d '{"author": "<AUTHOR>", "songID": "<SONG_ID>", "title": "<TITLE>", "thumbnailUrl": "<THUMBNAILURL>"}' "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/PLAYLISTS/<ROOM_ID>/queue/<SONG_ID>.json?auth=<ACCESS_TOKEN>"
+```
+
+////////
 
 PLAYLISTS/{$IDROOM}/queue/{$SONGID}/votes
 --> WRITE:
