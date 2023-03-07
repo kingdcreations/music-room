@@ -32,7 +32,7 @@ auth.uid !== null && ((query.orderByChild === 'private' && query.equalTo === fal
 (query.orderByChild === 'owner/uid' && query.equalTo === auth.uid))
 ```
 
-#### Curl requests:
+#### Example:
 #### Request only Public rooms
 ```
 curl "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/rooms.json?orderByChild=private&equalTo=false&auth=<ACCESS_TOKEN>"
@@ -42,7 +42,7 @@ curl "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/ro
 curl "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/rooms.json?orderByChild=owner/uid&equalTo=<UID>&auth=<ACCESS_TOKEN>"
 ```
 
-### WRITE
+### Write
 This endpoint is used to create a new room in the database. It requires a valid authentication token (auth.uid) to be present in the request header. 
 
 #### The following rules are applied:
@@ -63,11 +63,27 @@ newData.hasChildren(['name', 'owner', 'private'])
     newData.isString() && newData.val() === auth.uid
 ```
 
-#### Curl requests:
+#### Example:
 ```
 curl -X POST -d '{"name": "<ROOM_NAME>", "owner": {"uid": "<UID>"}, "private": <BOOLEAN>}' "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/rooms.json?auth=<ACCESS_TOKEN>"
 ```
 
+## Rooms/{$IDROOM}
+### Read
+This endpoint is used to read a specific room from the database. It requires a valid authentication token (auth.uid) to be present in the request header.
+
+#### The following rules are applied:
+The authenticated user must either exist in the users child node or be the owner of the room.
+
+#### Firebase security rules:
+```
+data.child('users').child(auth.uid).val() === true || data.child('owner').child('uid').val() === auth.uid
+```
+
+#### Example:
+```
+curl "https://music-room-81182-default-rtdb.europe-west1.firebasedatabase.app/rooms/<IDROOM>.json?auth=<ACCESS_TOKEN>"
+```
 
 
 
