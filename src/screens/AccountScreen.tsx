@@ -9,6 +9,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import * as Clipboard from 'expo-clipboard';
 import OrDivider from '../components/OrDivider';
 import Devices from '../components/Devices';
+import { Linking } from 'react-native';
 
 export default function AccountScreen() {
   const toast = useToast();
@@ -48,6 +49,10 @@ export default function AccountScreen() {
     .catch((e) => toast.show({ description: "Error while fetching Your Api Token." }))
   }
 
+  const openApiDoc = async () => {
+    await Linking.openURL("https://github.com/kingdcreations/music-room#readme");
+  }
+
   useEffect(() => {
     getDoc(doc(firebase.firestore, `users/${firebase.auth.currentUser?.uid}`))
       .then((snapshotData) => {
@@ -79,10 +84,14 @@ export default function AccountScreen() {
 
       <Devices />
 
+      <Divider my={3} />
+
+      <Text bold w="100%">API</Text>
+      <Button w="100%" onPress={genApiToken}>Click to copy API Token to your Clipboard</Button>
+      <Button w="100%" variant="link" onPress={openApiDoc}>Documentation</Button>
+
       <OrDivider />
       
-      <Button w="100%" onPress={genApiToken}>Click to copy API Token to your Clipboard</Button>
-
       <GoogleAuthButton />
     </Container>
   );
